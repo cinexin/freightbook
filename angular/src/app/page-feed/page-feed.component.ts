@@ -1,5 +1,4 @@
 import {Component, OnInit} from '@angular/core';
-import {AuthService} from "../auth.service";
 import {ApiService} from "../api.service";
 
 @Component({
@@ -10,7 +9,6 @@ import {ApiService} from "../api.service";
 export class PageFeedComponent implements OnInit {
 
   constructor(
-    private authService: AuthService,
     private apiService: ApiService
   ) { }
 
@@ -23,9 +21,5 @@ export class PageFeedComponent implements OnInit {
     this.apiService.makeRequest(requestObj).then((val: any) => {
       console.log(val)
     });
-  }
-
-  public logout(): void {
-    this.authService.logout();
   }
 }
