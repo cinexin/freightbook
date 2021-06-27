@@ -44,7 +44,7 @@ const messageSchema = new mongoose.Schema({
   from_id: {
     type: String,
     required: true,
-    unique: true
+    unique: false
   },
   content: [
     {
@@ -55,11 +55,7 @@ const messageSchema = new mongoose.Schema({
 });
 
 const userSchema = new mongoose.Schema({
-  firstname: {
-    type: String,
-    required: true
-  },
-  lastname: {
+  name: {
     type: String,
     required: true
   },
@@ -80,8 +76,14 @@ const userSchema = new mongoose.Schema({
   friend_requests: [String],
   besties: [String],
   enemies: [String],
-  posts: [postSchema],
-  messages: [messageSchema],
+  posts: {
+    type: [postSchema],
+    default: []
+  },
+  messages: {
+    type:[messageSchema],
+    default: []
+  },
   notifications: [String],
   profile_image: String,
   new_message_notifications: {
