@@ -2,6 +2,8 @@ const passport = require('passport');
 const mongoose = require('mongoose');
 const User = mongoose.model('User');
 
+const containsDuplicate = (array) =>  new Set(array).size !== array.length;
+
 const registerUser = ({ body }, res) => {
   if (Object.keys(body).length === 0 || !Object.values(body).every((val) => val)) {
     return res.send({ message: 'All Fields are required' });
@@ -67,6 +69,29 @@ const getSearchResults = (req, res) => {
   });
 }
 
+const makeFriendRequest = ({params}, res) => {
+  const fromUserId = params.from;
+  const toUserId = params.to;
+  User.findById(toUserId, (err, toUser) => {
+    if (err) { return res.json({err: err}); }
+    if (containsDuplicate([fromUserId,  ...toUser.friend_requests])) {
+      return res.json({ message: 'Friend request already sent.' })
+    }
+
+    toUser.friend_requests.push(fromUserId);
+    toUser.save((err, savedUser) => {
+      if (err) { return res.json({err: err}); }
+
+      return res.statusJson(201, {
+        message: 'Friend request successfully sent',
+        from: fromUserId,
+        to: toUserId,
+      });
+    });
+
+  });
+}
+
 const deleteAllUsers = (req, res) => {
   User.deleteMany({},{}, (err) => {
     if (err) { return res.send({error: err})}
@@ -80,4 +105,5 @@ module.exports = {
   loginUser,
   generateFeed,
   getSearchResults,
+  makeFriendRequest,
 }

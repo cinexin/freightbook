@@ -40,6 +40,11 @@ export class LocalStorageService {
     return this.get(this.tokenName)
   }
 
+  public getParsedToken() {
+    const token = this.getToken();
+    return token ? JSON.parse(atob(token.split('.')[1])) : '';
+  }
+
   public removeToken() {
     if (this.browserHasLocalStorageSupport()) {
       localStorage.removeItem(this.tokenName);

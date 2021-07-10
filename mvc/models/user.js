@@ -110,6 +110,7 @@ userSchema.methods.getJwt = function() {
   return jwt.sign({
     _id: this._id,
     email: this.email,
+    name: this.name,
   }, process.env.JWT_SECRET);
 }
 

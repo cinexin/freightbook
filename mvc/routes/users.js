@@ -9,6 +9,7 @@ router.post('/register', usersCtrl.registerUser);
 router.post('/login', usersCtrl.loginUser);
 router.get('/generate-feed', middleware.authorize, usersCtrl.generateFeed);
 router.get('/get-search-results', middleware.authorize, usersCtrl.getSearchResults);
+router.post('/make-friend-request/:from/:to', middleware.authorize, usersCtrl.makeFriendRequest);
 router.delete('/all', usersCtrl.deleteAllUsers);
 
 module.exports = router;

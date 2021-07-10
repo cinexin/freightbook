@@ -1,4 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
+import {ApiService} from "../api.service";
 
 @Component({
   selector: 'app-result-request',
@@ -8,9 +9,14 @@ import {Component, Input, OnInit} from '@angular/core';
 export class ResultRequestComponent implements OnInit {
 
   @Input() resultRequest: any;
-  constructor() { }
+  constructor(
+    private api: ApiService
+  ) { }
 
   ngOnInit(): void {
   }
 
+  makeFriendRequest(to: string): void {
+    this.api.makeFriendRequest(to);
+  }
 }
