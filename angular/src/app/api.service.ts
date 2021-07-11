@@ -80,4 +80,18 @@ export class ApiService {
       this.alertsService.onAlertEvent.emit('Some error occurred in the API call: ${err}')
     });
   }
+
+  public resolveFriendRequest(resolution: any, id: any) {
+    const to = this.localStorageService.getParsedToken()._id;
+    return new Promise((resolve, reject) => {
+      const requestObj = {
+        location: `users/resolve-friend-request/${id}/${to}?resolution=${resolution}`,
+        type: 'POST',
+        authorize: true
+      };
+      this.makeRequest(requestObj).then((val: any) => {
+        resolve(val);
+      });
+    });
+  }
 }

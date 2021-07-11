@@ -1,12 +1,20 @@
 <div class="result-request d-flex my-3 align-items-center bg-white shadow">
   <a href="#" class="p-4 w-max"><img alt="Profile image" src="/assets/images/f1.jpg" class="profile-img-md rounded "></a>
+
   <div>
     <h5><a href="#" class="link">{{resultRequest.name}}</a></h5>
     <h6>Montreal, Canada</h6>
     <div class="small">7 Mutual Friends</div>
   </div>
-  <div class="ml-auto mr-3 mt-3 align-self-start">
+
+  <div *ngIf="useFor == 'results'" class="ml-auto mr-3 mt-3 align-self-start">
     <button class="btn btn-sm btn-primary rounded-pill ml-1" (click)="makeFriendRequest(resultRequest._id)">Add Friend</button>
     <button class="btn btn-sm btn-success rounded-pill" data-toggle="modal" data-target="#staticBackdrop">Send Message</button>
+  </div>
+
+  <div *ngIf="useFor == 'request'" class="ml-auto mr-3 mt-3 align-self-start">
+    <button class="btn btn-sm btn-success rounded-pill ml-1" (click)="acceptFriendRequest()">Accept</button>
+    <button class="btn btn-sm btn-danger rounded-pill ml-1" (click)="declineFriendRequest()">Decline</button>
+    <button class="btn btn-sm btn-primary rounded-pill ml-1" (click)="sendMessage()">Send message</button>
   </div>
 </div>

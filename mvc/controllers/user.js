@@ -92,6 +92,27 @@ const makeFriendRequest = ({params}, res) => {
   });
 }
 
+const getUserData = ({params}, res) => {
+  const userId = params.userid;
+  User.findById(userId, (err, user) => {
+    if (err) { return res.json({err: err}); }
+    return res.statusJson(200, {user});
+  })
+}
+
+const getFriendRequests = ({query}, res) => {
+  const friendRequests = JSON.parse(query.friend_requests);
+  User.find({'_id': {$in: friendRequests}}, 'name profile_image', null,(err, users) => {
+    if (err) { return res.json({err: err}); }
+    console.log(`Users: ${users}`);
+    return res.statusJson(200, { message: 'Friend requests successfully fetched', users})
+  });
+}
+
+const resolveFriendRequest = ({query, params}, res) => {
+  res.json({ message: 'Resolve friend request', ...query, ...params });
+}
+
 const deleteAllUsers = (req, res) => {
   User.deleteMany({},{}, (err) => {
     if (err) { return res.send({error: err})}
@@ -106,4 +127,7 @@ module.exports = {
   generateFeed,
   getSearchResults,
   makeFriendRequest,
+  getUserData,
+  getFriendRequests,
+  resolveFriendRequest
 }
