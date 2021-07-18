@@ -70,7 +70,6 @@ export class ApiService {
       authorize: true
     };
     this.makeRequest(requestObj).then((val: any) => {
-      console.log(val);
       if (val.statusCode === 201) {
         this.alertsService.onAlertEvent.emit('Friend request successfully sent');
       } else {

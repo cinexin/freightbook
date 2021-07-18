@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {UserDataService} from "../user-data.service";
 import {ApiService} from "../api.service";
+import {Title} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-page-friend-requests',
@@ -13,14 +14,15 @@ export class PageFriendRequestsComponent implements OnInit {
 
   constructor(
     private centralUserData: UserDataService,
-    private api: ApiService
+    private api: ApiService,
+    private title: Title
   ) { }
 
   ngOnInit(): void {
+    this.title.setTitle('Freightbook - Friend Requests');
     this.centralUserData.getUserData.subscribe((data) => {
       this.userData = data;
       const friend_requests = JSON.stringify(this.userData.friend_requests);
-      console.log(this.userData);
       const requestObj = {
         location: `users/get-friend-requests?friend_requests=${friend_requests}`,
         type: 'GET',
@@ -29,7 +31,6 @@ export class PageFriendRequestsComponent implements OnInit {
       this.api.makeRequest(requestObj).then((val: any) => {
         if (val.statusCode === 200) {
           this.friendRequests = val.users;
-          console.log(this.friendRequests);
         }
       });
     });
