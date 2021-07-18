@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, Output, EventEmitter} from '@angular/core';
 import {ApiService} from "../api.service";
 import {LocalStorageService} from "../local-storage.service";
 
@@ -11,6 +11,7 @@ export class ResultRequestComponent implements OnInit {
 
   @Input() resultRequest: any;
   @Input() useFor: any;
+  @Output() resultRequestChange = new EventEmitter();
 
   constructor(
     private api: ApiService,
@@ -26,17 +27,22 @@ export class ResultRequestComponent implements OnInit {
   }
 
   acceptFriendRequest() {
-    console.log('Accept friend request from user,', this.resultRequest._id);
+    this.updateRequests();
     this.api.resolveFriendRequest('accept', this.resultRequest._id).then((val: any) => {
       console.log(val);
     });
   }
 
   declineFriendRequest() {
+    this.updateRequests();
     console.log('Decline friend request from user,', this.resultRequest._id);
     this.api.resolveFriendRequest('decline', this.resultRequest._id).then((val: any) => {
       console.log(val);
     });
+  }
+
+  private updateRequests() {
+    this.resultRequestChange.emit(this.resultRequest._id);
   }
 
   sendMessage() {

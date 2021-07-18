@@ -110,7 +110,41 @@ const getFriendRequests = ({query}, res) => {
 }
 
 const resolveFriendRequest = ({query, params}, res) => {
-  res.json({ message: 'Resolve friend request', ...query, ...params });
+  User.findById(params.to, (err, user) => {
+    const from = params.from;
+    const to = params.to;
+    if (err) { return res.json({ err }); }
+    user.friend_requests = user.friend_requests.filter(item => item != from);
+    const promise = new Promise(function(resolve, reject) {
+      if (query.resolution === 'accept') {
+        if (user.friends.contains(from)) {
+          return res.json({ message: 'Duplicate error.' });
+        }
+
+        user.friends.push(from);
+        User.findById(from, (err, user) => {
+          if (err) { return res.json({err}) }
+          if (user.friends.contains(to)) {
+            return res.json({ message: 'Duplicate error.' });
+          }
+
+          user.friends.push(to);
+          user.save((err, user) => {
+            if (err) { return res.json({err}) }
+            resolve();
+          });
+        });
+      } else {
+        resolve();
+      }
+    });
+    promise.then(() => {
+      user.save((err, user) => {
+        if (err) { return res.json({err}) }
+        res.statusJson(200, { message: 'Friend request resolved', ...query, ...params });
+      })
+    });
+  });
 }
 
 const deleteAllUsers = (req, res) => {

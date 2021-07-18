@@ -35,4 +35,7 @@ export class PageFriendRequestsComponent implements OnInit {
     });
   }
 
+  updateFriendRequests(id: string) {
+    this.friendRequests = this.friendRequests.filter((item: any) => item._id !== id);
+  }
 }

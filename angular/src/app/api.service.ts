@@ -90,6 +90,12 @@ export class ApiService {
         authorize: true
       };
       this.makeRequest(requestObj).then((val: any) => {
+        if (val.statusCode === 200) {
+          const resolution = (val.resolution == 'accept') ? 'accepted' : 'declined';
+          this.alertsService.onAlertEvent.emit(`Successfully ${resolution} friend request`);
+        } else {
+          this.alertsService.onAlertEvent.emit(`Something went wrong and we couldn't handle the friend request resolution`);
+        }
         resolve(val);
       }).catch((err: any) => {
         reject(err);
