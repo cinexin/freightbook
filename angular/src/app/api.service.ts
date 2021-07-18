@@ -91,6 +91,8 @@ export class ApiService {
       };
       this.makeRequest(requestObj).then((val: any) => {
         resolve(val);
+      }).catch((err: any) => {
+        reject(err);
       });
     });
   }
