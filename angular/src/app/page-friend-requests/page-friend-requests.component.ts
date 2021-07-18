@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, Inject, OnInit} from '@angular/core';
 import {UserDataService} from "../user-data.service";
 import {ApiService} from "../api.service";
 import {Title} from "@angular/platform-browser";
+import {DOCUMENT} from "@angular/common";
 
 @Component({
   selector: 'app-page-friend-requests',
@@ -15,10 +16,15 @@ export class PageFriendRequestsComponent implements OnInit {
   constructor(
     private centralUserData: UserDataService,
     private api: ApiService,
-    private title: Title
+    private title: Title,
+    @Inject(DOCUMENT) private document: Document
   ) { }
 
   ngOnInit(): void {
+    const sidebar = this.document.getElementById('sidebarToggleTop');
+    if (sidebar) {
+      sidebar.classList.add('d-none');
+    }
     this.title.setTitle('Freightbook - Friend Requests');
     this.centralUserData.getUserData.subscribe((data) => {
       this.userData = data;

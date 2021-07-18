@@ -1,7 +1,8 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, Inject, OnInit} from '@angular/core';
 import {ApiService} from "../api.service";
 import {ActivatedRoute} from "@angular/router";
 import {Title} from "@angular/platform-browser";
+import {DOCUMENT} from "@angular/common";
 
 @Component({
   selector: 'app-page-searches',
@@ -13,10 +14,15 @@ export class PageSearchesComponent implements OnInit {
   constructor(
     private apiService: ApiService,
     private route: ActivatedRoute,
-    private title: Title
+    private title: Title,
+    @Inject(DOCUMENT) private document: Document
   ) { }
 
   ngOnInit(): void {
+    const sidebar = this.document.getElementById('sidebarToggleTop');
+    if (sidebar) {
+      sidebar.classList.add('d-none');
+    }
     this.title.setTitle('Search results');
     this.subscription = this.route.params.subscribe(params => {
       this.query = params.query;
