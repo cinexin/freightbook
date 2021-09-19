@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {AuthService} from "../auth.service";
 import {Router} from "@angular/router";
 import {LocalStorageService} from "../local-storage.service";
-import {AlertsService} from "../alerts.service";
+import {EventEmitterService} from "../event-emitter.service";
 import {UserDataService} from "../user-data.service";
 import {ApiService} from "../api.service";
 
@@ -17,7 +17,7 @@ export class TopbarComponent implements OnInit {
     private authService: AuthService,
     private router: Router,
     private localStorageService: LocalStorageService,
-    private alertsService: AlertsService,
+    private eventEmitterService: EventEmitterService,
     private centralUserData: UserDataService,
     private api: ApiService
   ) { }
@@ -32,8 +32,11 @@ export class TopbarComponent implements OnInit {
   ngOnInit(): void {
     this.usersName = this.localStorageService.getParsedToken().name;
     this.usersId = this.localStorageService.getParsedToken()._id;
-    this.alertsService.onAlertEvent.subscribe((msg: string) => {
+    this.eventEmitterService.onAlertEvent.subscribe((msg: string) => {
       this.alertMessage = msg;
+    });
+    this.eventEmitterService.updateNumOfFriendRequestsEvent.subscribe(() => {
+      this.numOfFriendRequests--;
     });
     this.centralUserData.getUserData.subscribe((data) => {
       this.userData = data;

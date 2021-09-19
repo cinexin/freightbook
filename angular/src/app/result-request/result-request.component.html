@@ -7,14 +7,13 @@
     <div class="small">7 Mutual Friends</div>
   </div>
 
-  <div *ngIf="useFor == 'results'" class="ml-auto mr-3 mt-3 align-self-start">
-    <button class="btn btn-sm btn-primary rounded-pill ml-1" (click)="makeFriendRequest(resultRequest._id)">Add Friend</button>
-    <button class="btn btn-sm btn-success rounded-pill" data-toggle="modal" data-target="#staticBackdrop">Send Message</button>
+  <div class="ml-auto mr-3 mt-3 align-self-start">
+    <button *ngIf="useFor === 'results' && !haveSentFriendRequest && !haveReceivedFriendRequest && !isFriend" class="btn btn-sm btn-primary rounded-pill ml-1" (click)="makeFriendRequest(resultRequest._id); haveSentFriendRequest = true;">Add Friend</button>
+    <button *ngIf="haveSentFriendRequest" class="btn btn-sm btn-warning rounded-pill ml-1" data-toggle="modal" data-target="#staticBackdrop">Friend request pending</button>
+    <button *ngIf="isFriend" class="btn btn-sm btn-info rounded-pill ml-1" data-toggle="modal" data-target="#staticBackdrop">View profile</button>
+    <button *ngIf="useFor === 'request' || haveReceivedFriendRequest" class="btn btn-sm btn-primary rounded-pill ml-1" data-toggle="modal" data-target="#staticBackdrop" (click)="acceptFriendRequest(); haveReceivedFriendRequest=false; isFriend=true">Accept</button>
+    <button *ngIf="useFor === 'request' || haveReceivedFriendRequest" class="btn btn-sm btn-danger rounded-pill ml-1" data-toggle="modal" data-target="#staticBackdrop" (click)="declineFriendRequest(); haveReceivedFriendRequest=false">Decline</button>
+    <button class="btn btn-sm btn-success rounded-pill ml-1" data-toggle="modal" data-target="#staticBackdrop" (click)="sendMessage()">Send Message</button>
   </div>
 
-  <div *ngIf="useFor == 'request'" class="ml-auto mr-3 mt-3 align-self-start">
-    <button class="btn btn-sm btn-success rounded-pill ml-1" (click)="acceptFriendRequest()">Accept</button>
-    <button class="btn btn-sm btn-danger rounded-pill ml-1" (click)="declineFriendRequest()">Decline</button>
-    <button class="btn btn-sm btn-primary rounded-pill ml-1" (click)="sendMessage()">Send message</button>
-  </div>
 </div>

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { LocalStorageService } from "./local-storage.service";
-import {AlertsService} from "./alerts.service";
+import {EventEmitterService} from "./event-emitter.service";
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +11,7 @@ export class ApiService {
   constructor(
     private http: HttpClient,
     private localStorageService: LocalStorageService,
-    private alertsService: AlertsService
+    private eventEmitterService: EventEmitterService
   ) { }
 
   private baseUrl = 'http://localhost:3000';
@@ -71,12 +71,12 @@ export class ApiService {
     };
     this.makeRequest(requestObj).then((val: any) => {
       if (val.statusCode === 201) {
-        this.alertsService.onAlertEvent.emit('Friend request successfully sent');
+        this.eventEmitterService.onAlertEvent.emit('Friend request successfully sent');
       } else {
-        this.alertsService.onAlertEvent.emit('Something went wrong');
+        this.eventEmitterService.onAlertEvent.emit('Something went wrong');
       }
     }).catch((err: any) => {
-      this.alertsService.onAlertEvent.emit('Some error occurred in the API call: ${err}')
+      this.eventEmitterService.onAlertEvent.emit('Some error occurred in the API call: ${err}')
     });
   }
 
@@ -91,9 +91,10 @@ export class ApiService {
       this.makeRequest(requestObj).then((val: any) => {
         if (val.statusCode === 200) {
           const resolution = (val.resolution == 'accept') ? 'accepted' : 'declined';
-          this.alertsService.onAlertEvent.emit(`Successfully ${resolution} friend request`);
+          this.eventEmitterService.onAlertEvent.emit(`Successfully ${resolution} friend request`);
+          this.eventEmitterService.updateNumOfFriendRequestsEvent.emit();
         } else {
-          this.alertsService.onAlertEvent.emit(`Something went wrong and we couldn't handle the friend request resolution`);
+          this.eventEmitterService.onAlertEvent.emit(`Something went wrong and we couldn't handle the friend request resolution`);
         }
         resolve(val);
       }).catch((err: any) => {

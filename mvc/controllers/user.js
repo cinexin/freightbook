@@ -61,7 +61,7 @@ const generateFeed = (req, res) => {
 const getSearchResults = (req, res) => {
   const query = req.query;
   if (!query.query) { return res.json({err: 'Missing query'}); }
-  User.find({name: {$regex: query.query, $options: 'i'}}, 'name', {},  (err, docs) => {
+  User.find({name: {$regex: query.query, $options: 'i'}}, 'name friends friend_requests', {},  (err, docs) => {
     if (err) {return res.json({err})}
     docs = docs.slice(0, 20);
     docs = docs.filter(i => i._id != req.user._id);
@@ -117,14 +117,14 @@ const resolveFriendRequest = ({query, params}, res) => {
     user.friend_requests = user.friend_requests.filter(item => item != from);
     const promise = new Promise(function(resolve, reject) {
       if (query.resolution === 'accept') {
-        if (user.friends.contains(from)) {
+        if (user.friends.includes(from)) {
           return res.json({ message: 'Duplicate error.' });
         }
 
         user.friends.push(from);
         User.findById(from, (err, user) => {
           if (err) { return res.json({err}) }
-          if (user.friends.contains(to)) {
+          if (user.friends.includes(to)) {
             return res.json({ message: 'Duplicate error.' });
           }
 
