@@ -1,6 +1,7 @@
 const passport = require('passport');
 const mongoose = require('mongoose');
 const User = mongoose.model('User');
+const Post = mongoose.model('Post');
 
 const containsDuplicate = (array) =>  new Set(array).size !== array.length;
 
@@ -24,7 +25,7 @@ const registerUser = ({ body }, res) => {
   user.setPassword(body.password);
   user.save((err, newUSer) => {
     if (err) {
-      if (err.errmsg && err.errmsg.includes('duplicate key error')) {
+      if (err.errmsg && err.errmsg.includes('duplicate key error') && err.errmsg.includes('email')) {
         return res.json({ message: 'The provided email is already taken.' });
       }
       return res.status(422).json({ message: 'Something went wrong.' });
@@ -147,6 +148,33 @@ const resolveFriendRequest = ({query, params}, res) => {
   });
 }
 
+const createPost = ({body, user}, res) => {
+  if (!body.content || !body.theme) {
+    return res.statusJson(400, {message: 'content / theme not specified'})
+  }
+  let userId = user._id;
+
+  const post = new Post();
+  post.theme = body.theme;
+  post.content = body.content;
+
+  User.findById(userId, (err, user) => {
+    if (err) { return res.json(err) }
+    user.posts.push(post);
+    user.save((err) => {
+      if (err) { return res.json(err) }
+      return res.statusJson(201, {message: 'Create post', ...body, userid: userId})
+    });
+  });
+}
+
+const getAllUsers = (req, res) => {
+  User.find({},{}, {}, (err, users) => {
+    if (err) { return res.send({error: err})}
+    return res.json({users})
+  });
+}
+
 const deleteAllUsers = (req, res) => {
   User.deleteMany({},{}, (err) => {
     if (err) { return res.send({error: err})}
@@ -155,6 +183,7 @@ const deleteAllUsers = (req, res) => {
 }
 
 module.exports = {
+  getAllUsers,
   deleteAllUsers,
   registerUser,
   loginUser,
@@ -163,5 +192,6 @@ module.exports = {
   makeFriendRequest,
   getUserData,
   getFriendRequests,
-  resolveFriendRequest
+  resolveFriendRequest,
+  createPost
 }

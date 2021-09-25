@@ -8,6 +8,7 @@ export class LocalStorageService {
   constructor() { }
 
   tokenName = '--token-ASM';
+  postThemeName = '--post-theme-ASM-PROD';
 
   private browserHasLocalStorageSupport(): boolean {
     if (!localStorage) {
@@ -49,5 +50,13 @@ export class LocalStorageService {
     if (this.browserHasLocalStorageSupport()) {
       localStorage.removeItem(this.tokenName);
     }
+  }
+
+  public setPostTheme(theme: string) {
+    this.set(this.postThemeName, theme)
+  }
+
+  public getPostTheme(): string {
+    return this.get(this.postThemeName) || 'primary' ;
   }
 }
