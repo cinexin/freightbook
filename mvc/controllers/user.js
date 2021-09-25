@@ -56,7 +56,45 @@ const loginUser = (req, res) => {
 }
 
 const generateFeed = (req, res) => {
-  res.status(200).json(({ message: 'Generating posts for users feed.'}));
+  const userId = req.user._id;
+  let posts = [];
+  const maxAmountOfPosts = 38;
+
+  const addNameToPosts = (posts, name) => {
+    let item;
+    for (item of posts) {
+      item.name = name;
+    }
+  }
+  const myPosts = new Promise((resolve, reject) => {
+    User.findById(userId, 'name posts friends', {lean: true}, (err, user) => {
+      if (err) {return res.json({err})}
+      addNameToPosts(user.posts, user.name)
+      posts.push(...user.posts);
+      resolve(user.friends);
+    });
+  });
+
+  const myFriendsPosts = myPosts.then((friendsArray) => {
+    return new Promise((resolve, reject) => {
+      User.find({'_id': {$in: friendsArray}}, 'name posts', {lean: true}, (err, users) => {
+        if (err) { return res.json({err}); }
+
+        let user;
+        for (user of users) {
+          addNameToPosts(user.posts, user.name)
+          posts.push(...user.posts);
+        }
+        resolve();
+      });
+    });
+  })
+
+  myFriendsPosts.then(() => {
+    posts.sort((a, b) => (a.date > b.date) ? -1 : 1);
+    posts = posts.slice(0, maxAmountOfPosts);
+    res.status(200).json(({ posts: posts }));
+  });
 }
 
 const getSearchResults = (req, res) => {
