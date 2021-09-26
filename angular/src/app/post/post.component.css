@@ -1,0 +1,24 @@
+.card-text {
+  line-height: 170%;
+  color: #585858;
+}
+
+.card {
+  transition: transform .4s;
+}
+
+.card:hover {
+  transform: scale(1.05);
+}
+
+.like-icon {
+  cursor: pointer;
+}
+
+.liked {
+  transform: scale(1.8) translateX(-3px);
+}
+
+.comment-body {
+  color: #585858;
+}
