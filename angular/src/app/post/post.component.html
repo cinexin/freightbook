@@ -1,5 +1,5 @@
 <div class="card mt-4">
-  <div class="card-header bg-pink">
+  <div [ngClass]="'bg-' + post.theme" class="card-header">
     <a href="#"><img class="profile-img-sm rounded-circle" src="/assets/images/f1.jpg"></a>
     <span class="ml-3 h5"><a class="link text-white" href="#">{{post.name}}</a></span>
   </div>
@@ -8,16 +8,16 @@
     <div class="d-flex justify-content-between py-2">
       <small class="text-muted">11 mins ago</small>
       <div>
-        <a href="#"><i class="hov-scale text-pink fas fa-thumbs-up"></i></a>
-        <span class="ml-3 badge badge-pink badge-pill">{{post.likes}}</span>
+        <a href="#"><i [ngClass]="'text-' + post.theme" class="hov-scale fas fa-thumbs-up"></i></a>
+        <span [ngClass]="'badge-' + post.theme" class="ml-3 badge badge-pill">{{post.likes}}</span>
       </div>
     </div>
   </div>
   <div>
-    <a href="#rjkvgerrjg" class="d-block card-header py-3" data-toggle="collapse" role="button">
-      <h6 class="m-0 font-weight-bold text-pink">Comments</h6>
+    <a href="{{'#' + fakeId}}" class="d-block card-header py-3" data-toggle="collapse" role="button">
+      <h6 [ngClass]="'text-' + post.theme" class="m-0 font-weight-bold">Comments</h6>
     </a>
-    <div class="collapse" id="rjkvgerrjg">
+    <div class="collapse" id="{{fakeId}}">
       <div class="card-body">
         <form class="mb-2" action="" method="post">
           <div class="form-group">
@@ -26,7 +26,10 @@
         </form>
 
         <div class="comment-list">
-          <div class="comment p-3 my-2 rounded">
+          <div *ngIf="post && !post.comments.length" class="text-center mt-2">
+            Be the first to comment on this post
+          </div>
+          <!--<div class="comment p-3 my-2 rounded">
             <div class="comment-user">
               <a href="#"><img src="/assets/images/f1.jpg" class="rounded-circle profile-img-sm"></a>
               <span class="ml-2"><a href="#" class="link">Sarah Parker</a></span>
@@ -34,16 +37,7 @@
             <div class="comment-body pl-3 mt-2">
               Hey, that's pretty cool!
             </div>
-          </div>
-          <div class="comment p-3 my-2 rounded">
-            <div class="comment-user">
-              <a href="#"><img src="/assets/images/f1.jpg" class="rounded-circle profile-img-sm"></a>
-              <span class="ml-2"><a href="#" class="link">Sarah Parker</a></span>
-            </div>
-            <div class="comment-body pl-3 mt-2">
-              Sales lean startup agile development vesting period advisor business-to-business. Focus stealth partner network crowdfunding
-            </div>
-          </div>
+          </div>-->
         </div>
 
       </div>

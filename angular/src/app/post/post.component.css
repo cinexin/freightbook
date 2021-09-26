@@ -19,6 +19,10 @@
   transform: scale(1.8) translateX(-3px);
 }
 
+.comment {
+  background-color: #F5F5F5;
+}
+
 .comment-body {
   color: #585858;
 }
