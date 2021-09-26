@@ -2,6 +2,7 @@ const passport = require('passport');
 const mongoose = require('mongoose');
 const User = mongoose.model('User');
 const Post = mongoose.model('Post');
+const timeAgo = require('time-ago');
 
 const containsDuplicate = (array) =>  new Set(array).size !== array.length;
 
@@ -60,16 +61,17 @@ const generateFeed = (req, res) => {
   let posts = [];
   const maxAmountOfPosts = 38;
 
-  const addNameToPosts = (posts, name) => {
+  const addNameAndAgoToPosts = (posts, name) => {
     let item;
     for (item of posts) {
       item.name = name;
+      item.ago = timeAgo.ago(item.date);
     }
   }
   const myPosts = new Promise((resolve, reject) => {
     User.findById(userId, 'name posts friends', {lean: true}, (err, user) => {
       if (err) {return res.json({err})}
-      addNameToPosts(user.posts, user.name)
+      addNameAndAgoToPosts(user.posts, user.name)
       posts.push(...user.posts);
       resolve(user.friends);
     });
@@ -82,7 +84,7 @@ const generateFeed = (req, res) => {
 
         let user;
         for (user of users) {
-          addNameToPosts(user.posts, user.name)
+          addNameAndAgoToPosts(user.posts, user.name)
           posts.push(...user.posts);
         }
         resolve();
@@ -93,7 +95,7 @@ const generateFeed = (req, res) => {
   myFriendsPosts.then(() => {
     posts.sort((a, b) => (a.date > b.date) ? -1 : 1);
     posts = posts.slice(0, maxAmountOfPosts);
-    res.status(200).json(({ posts: posts }));
+    res.statusJson(200, { posts: posts });
   });
 }
 
@@ -198,10 +200,12 @@ const createPost = ({body, user}, res) => {
 
   User.findById(userId, (err, user) => {
     if (err) { return res.json(err) }
+    let newPost = post.toObject();
+    newPost.name = user.name;
     user.posts.push(post);
     user.save((err) => {
       if (err) { return res.json(err) }
-      return res.statusJson(201, {message: 'Create post', ...body, userid: userId})
+      return res.statusJson(201, {message: 'Create post', ...body, userid: userId, newPost})
     });
   });
 }

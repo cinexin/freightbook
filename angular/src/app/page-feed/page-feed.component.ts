@@ -26,13 +26,14 @@ export class PageFeedComponent implements OnInit {
       authorize: true
     }
     this.apiService.makeRequest(requestObj).then((val: any) => {
-      console.log(val);
-      this.posts.col1 = val.posts.filter((val: any, i: number) => i % 4 === 0);
-      this.posts.col2 = val.posts.filter((val: any, i: number) => i % 4 === 1);
-      this.posts.col3 = val.posts.filter((val: any, i: number) => i % 4 === 2);
-      this.posts.col4 = val.posts.filter((val: any, i: number) => i % 4 === 3);
-      console.log('POSTS OBJECT');
-      console.log(this.posts);
+      if (val.statusCode == 200) {
+        this.posts.col1 = val.posts.filter((val: any, i: number) => i % 4 === 0);
+        this.posts.col2 = val.posts.filter((val: any, i: number) => i % 4 === 1);
+        this.posts.col3 = val.posts.filter((val: any, i: number) => i % 4 === 2);
+        this.posts.col4 = val.posts.filter((val: any, i: number) => i % 4 === 3);
+      } else {
+        this.events.onAlertEvent.emit('Something went wrong, feed couldn\'t be retrieved');
+      }
     });
   }
 
@@ -66,6 +67,12 @@ export class PageFeedComponent implements OnInit {
     }
     this.apiService.makeRequest(requestObject).then((val: any) => {
       console.log(val);
+      if (val.statusCode === 201) {
+        val.newPost.ago = "now";
+        this.posts.col1.unshift(val.newPost);
+      } else {
+        this.events.onAlertEvent.emit('Post couldn\'t be created');
+      }
       this.newPostContent = '';
     });
   }
