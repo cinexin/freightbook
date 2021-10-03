@@ -21,9 +21,9 @@
     </a>
     <div class="collapse" id="{{fakeId}}">
       <div class="card-body">
-        <form class="mb-2" action="" method="post">
+        <form (submit)="postComment()" class="mb-2" action="" method="post">
           <div class="form-group">
-            <input type="text" class="rounded-pill form-control" placeholder="Leave a comment.">
+            <input [(ngModel)]="comment" name="comment" type="text" class="rounded-pill form-control" placeholder="Leave a comment.">
           </div>
         </form>
 
@@ -31,15 +31,20 @@
           <div *ngIf="!post.comments.length" class="text-center mt-2">
             Be the first to comment on this post
           </div>
-          <!--<div class="comment p-3 my-2 rounded">
+
+          <div *ngFor="let comment of post.comments" class="comment p-3 my-2 rounded">
             <div class="comment-user">
               <a href="#"><img src="/assets/images/f1.jpg" class="rounded-circle profile-img-sm"></a>
-              <span class="ml-2"><a href="#" class="link">Sarah Parker</a></span>
+              <span class="ml-2">
+                <a href="#" class="link">
+                  {{comment.commenter_name}}
+                </a>
+              </span>
             </div>
             <div class="comment-body pl-3 mt-2">
-              Hey, that's pretty cool!
+              {{comment.comment_content}}
             </div>
-          </div>-->
+          </div>
         </div>
 
       </div>

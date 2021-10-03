@@ -16,5 +16,6 @@ router.post('/make-friend-request/:from/:to', middleware.authorize, usersCtrl.ma
 router.post('/resolve-friend-request/:from/:to', middleware.authorize, usersCtrl.resolveFriendRequest);
 router.post('/create-post', middleware.authorize, usersCtrl.createPost);
 router.post('/like-unlike/:ownerId/:postId', middleware.authorize, usersCtrl.likeUnlike);
+router.post('/post-comment/:ownerId/:postId', middleware.authorize, usersCtrl.commentOnPost);
 
 module.exports = router;

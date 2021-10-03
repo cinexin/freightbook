@@ -2,9 +2,33 @@ const passport = require('passport');
 const mongoose = require('mongoose');
 const User = mongoose.model('User');
 const Post = mongoose.model('Post');
+const Comment = mongoose.model('Comment');
 const timeAgo = require('time-ago');
 
 const containsDuplicate = (array) =>  new Set(array).size !== array.length;
+
+const enrichComments = (posts) => {
+  return new Promise((resolve, reject) => {
+    const promises = [];
+    for (let post of posts) {
+      for (let comment of post.comments) {
+        const promise = new Promise((resolve1, reject1) => {
+          User.findById(comment.commenter_id, "name profile_image", (err, user) => {
+            comment.commenter_name = user.name;
+            comment.commenter_profile_image = user.profile_image;
+            resolve1(comment)
+          });
+        });
+        promises.push(promise);
+      }
+    }
+    Promise.all(promises).then((val) => {
+      console.log(val);
+      resolve(posts);
+    });
+  });
+}
+
 
 const registerUser = ({ body }, res) => {
   if (Object.keys(body).length === 0 || !Object.values(body).every((val) => val)) {
@@ -96,7 +120,9 @@ const generateFeed = (req, res) => {
   myFriendsPosts.then(() => {
     posts.sort((a, b) => (a.date > b.date) ? -1 : 1);
     posts = posts.slice(0, maxAmountOfPosts);
-    res.statusJson(200, { posts: posts });
+    enrichComments(posts).then((posts) => {
+      res.statusJson(200, { posts: posts });
+    });
   });
 }
 
@@ -203,6 +229,7 @@ const createPost = ({body, user}, res) => {
     if (err) { return res.json(err) }
     let newPost = post.toObject();
     newPost.name = user.name;
+    newPost.ownerId = user._id;
     user.posts.push(post);
     user.save((err) => {
       if (err) { return res.json(err) }
@@ -215,7 +242,7 @@ const likeUnlike = (req, res) => {
   const userIdThatDoesTheLike = req.user._id;
   const postIdLiked = req.params.postId;
   const postOwnerUserId = req.params.ownerId;
-  User.findById(req.params.ownerId, (err, user) => {
+  User.findById(postOwnerUserId, (err, user) => {
     if (err) { return res.json({err}) }
     const post = user.posts.id(postIdLiked);
     if (post.likes.includes(userIdThatDoesTheLike)) {
@@ -228,6 +255,35 @@ const likeUnlike = (req, res) => {
       res.statusJson(200, { message: 'Like or unlike a post...' });
     });
   });
+}
+
+const commentOnPost = (req, res) => {
+  const ownerId = req.params.ownerId;
+  const postId = req.params.postId;
+  const commenterUserId = req.user._id;
+
+  User.findById(ownerId, (err, user) => {
+    if (err) { return res.json({err}) }
+
+    const post = user.posts.id(postId);
+    const comment = new Comment();
+    comment.commenter_id = commenterUserId;
+    comment.comment_content = req.body.content;
+    post.comments.push(comment);
+    user.save((err, user) => {
+      if (err) { return res.json({err})}
+      User.findById(commenterUserId, "name profile_image", (err, commenter) => {
+        if (err) { return res.json({err})}
+
+        res.statusJson(201, {
+          message: 'Post comment',
+          comment,
+          commenter
+        });
+      })
+    });
+  });
+
 }
 
 const getAllUsers = (req, res) => {
@@ -256,5 +312,6 @@ module.exports = {
   getFriendRequests,
   resolveFriendRequest,
   createPost,
-  likeUnlike
+  likeUnlike,
+  commentOnPost
 }

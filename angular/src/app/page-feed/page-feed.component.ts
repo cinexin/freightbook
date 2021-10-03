@@ -27,6 +27,7 @@ export class PageFeedComponent implements OnInit {
     }
     this.apiService.makeRequest(requestObj).then((val: any) => {
       if (val.statusCode == 200) {
+        console.log(val.posts[0]);
         this.posts.col1 = val.posts.filter((val: any, i: number) => i % 4 === 0);
         this.posts.col2 = val.posts.filter((val: any, i: number) => i % 4 === 1);
         this.posts.col3 = val.posts.filter((val: any, i: number) => i % 4 === 2);

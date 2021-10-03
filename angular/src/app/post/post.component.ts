@@ -15,6 +15,7 @@ export class PostComponent implements OnInit {
   public align: string = 'left';
   public liked: boolean = false;
   public userId: string = '';
+  public comment: string = '';
 
   constructor(
     private apiService: ApiService,
@@ -63,6 +64,29 @@ export class PostComponent implements OnInit {
       } else {
         this.post.likes.push(this.userId);
         this.liked = true;
+      }
+    });
+  }
+
+  postComment() {
+    if (this.comment.length == 0) { return; }
+    console.log("POST COMMENT", this.comment);
+    const requestObj = {
+      location: `users/post-comment/${this.post.ownerId}/${this.post._id}`,
+      type: 'POST',
+      authorize: true,
+      body: { content: this.comment }
+    }
+    this.apiService.makeRequest(requestObj).then((val: any) => {
+      console.log(val);
+      if (val.statusCode == 201) {
+        const newComment = {
+          ...val.comment,
+          commenter_name: val.commenter.name,
+          commenter_image: val.commenter.profile_image
+        }
+        this.post.comments.push(newComment);
+        this.comment = '';
       }
     });
   }
