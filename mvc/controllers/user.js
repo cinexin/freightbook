@@ -61,17 +61,18 @@ const generateFeed = (req, res) => {
   let posts = [];
   const maxAmountOfPosts = 38;
 
-  const addNameAndAgoToPosts = (posts, name) => {
+  const enrichPosts = (posts, name, ownerId) => {
     let item;
     for (item of posts) {
       item.name = name;
       item.ago = timeAgo.ago(item.date);
+      item.ownerId = ownerId;
     }
   }
   const myPosts = new Promise((resolve, reject) => {
     User.findById(userId, 'name posts friends', {lean: true}, (err, user) => {
       if (err) {return res.json({err})}
-      addNameAndAgoToPosts(user.posts, user.name)
+      enrichPosts(user.posts, user.name, user._id)
       posts.push(...user.posts);
       resolve(user.friends);
     });
@@ -84,7 +85,7 @@ const generateFeed = (req, res) => {
 
         let user;
         for (user of users) {
-          addNameAndAgoToPosts(user.posts, user.name)
+          enrichPosts(user.posts, user.name, user._id)
           posts.push(...user.posts);
         }
         resolve();
@@ -210,6 +211,25 @@ const createPost = ({body, user}, res) => {
   });
 }
 
+const likeUnlike = (req, res) => {
+  const userIdThatDoesTheLike = req.user._id;
+  const postIdLiked = req.params.postId;
+  const postOwnerUserId = req.params.ownerId;
+  User.findById(req.params.ownerId, (err, user) => {
+    if (err) { return res.json({err}) }
+    const post = user.posts.id(postIdLiked);
+    if (post.likes.includes(userIdThatDoesTheLike)) {
+      post.likes.splice(post.likes.indexOf(userIdThatDoesTheLike), 1);
+    } else {
+      post.likes.push(userIdThatDoesTheLike);
+    }
+    user.save(() => {
+      if (err) { return res.json({err})}
+      res.statusJson(200, { message: 'Like or unlike a post...' });
+    });
+  });
+}
+
 const getAllUsers = (req, res) => {
   User.find({},{}, {}, (err, users) => {
     if (err) { return res.send({error: err})}
@@ -235,5 +255,6 @@ module.exports = {
   getUserData,
   getFriendRequests,
   resolveFriendRequest,
-  createPost
+  createPost,
+  likeUnlike
 }

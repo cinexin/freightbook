@@ -16,6 +16,11 @@
 }
 
 .liked {
+  transform: scale(1.8)
+  translateX(-3px);
+}
+
+.liked {
   transform: scale(1.8) translateX(-3px);
 }
 

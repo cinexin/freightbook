@@ -14,9 +14,9 @@
     "express-jwt": "^6.0.0",
     "http-errors": "~1.6.3",
     "jsonwebtoken": "^8.5.1",
-    "mongoose": "^5.12.9",
+    "mongoose": "^6.0.8",
     "morgan": "~1.9.1",
-    "nodemon": "^2.0.12",
+    "nodemon": "^2.0.13",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
     "time-ago": "^0.2.1"

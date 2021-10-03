@@ -15,5 +15,6 @@ router.get('/get-user-data/:userid', middleware.authorize, usersCtrl.getUserData
 router.post('/make-friend-request/:from/:to', middleware.authorize, usersCtrl.makeFriendRequest);
 router.post('/resolve-friend-request/:from/:to', middleware.authorize, usersCtrl.resolveFriendRequest);
 router.post('/create-post', middleware.authorize, usersCtrl.createPost);
+router.post('/like-unlike/:ownerId/:postId', middleware.authorize, usersCtrl.likeUnlike);
 
 module.exports = router;
