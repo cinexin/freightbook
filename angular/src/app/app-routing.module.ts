@@ -32,7 +32,7 @@ const routes: Routes = [
     data: { loggedIn: true }
   },
   {
-    path: 'profile',
+    path: 'profile/:userId',
     component: PageProfileComponent,
     canActivate: [AuthService],
     data: { loggedIn: true }

@@ -4,8 +4,12 @@ const User = mongoose.model('User');
 const Post = mongoose.model('Post');
 const Comment = mongoose.model('Comment');
 const timeAgo = require('time-ago');
+const {random} = require("mongoose/lib/utils");
 
 const containsDuplicate = (array) =>  new Set(array).size !== array.length;
+const getRandom = (min, max) => {
+  return Math.floor(Math.random() * (max - min) ) + min;
+}
 
 const enrichComments = (posts) => {
   return new Promise((resolve, reject) => {
@@ -29,6 +33,15 @@ const enrichComments = (posts) => {
   });
 }
 
+const enrichPosts = (posts, user) => {
+  let item;
+  for (item of posts) {
+    item.name = user.name;
+    item.ago = timeAgo.ago(item.date);
+    item.ownerProfileImage = user.profile_image;
+    item.ownerId = user._id;
+  }
+}
 
 const registerUser = ({ body }, res) => {
   if (Object.keys(body).length === 0 || !Object.values(body).every((val) => val)) {
@@ -85,15 +98,7 @@ const generateFeed = (req, res) => {
   let posts = [];
   const maxAmountOfPosts = 38;
 
-  const enrichPosts = (posts, user) => {
-    let item;
-    for (item of posts) {
-      item.name = user.name;
-      item.ago = timeAgo.ago(item.date);
-      item.ownerProfileImage = user.profile_image;
-      item.ownerId = user._id;
-    }
-  }
+
   const myPosts = new Promise((resolve, reject) => {
     User.findById(userId, 'name posts profile_image friends', {lean: true}, (err, user) => {
       if (err) {return res.json({err})}
@@ -163,9 +168,39 @@ const makeFriendRequest = ({params}, res) => {
 
 const getUserData = ({params}, res) => {
   const userId = params.userid;
-  User.findById(userId, (err, user) => {
+  User.findById(userId, '-salt -password', {lean: true}, (err, user) => {
     if (err) { return res.json({err: err}); }
-    return res.statusJson(200, {user});
+    const getRandomFriends = (friendsList) => {
+      let copyOfFriendsList = Array.from(friendsList);
+      let randomIds = [];
+      for (let i = 0; i<6; i++) {
+        if (friendsList.length <= 6) {
+          randomIds = copyOfFriendsList;
+          break;
+        }
+
+        const randomId = getRandom(0, copyOfFriendsList.length - 1);
+        randomIds.push(copyOfFriendsList[randomId])
+        copyOfFriendsList.splice(randomId, 1);
+      }
+      return new Promise((resolve, reject) => {
+        User.find({'_id': {$in: randomIds}}, 'name profile_image', (err, friends) => {
+          if (err) { return res.json ({err})}
+          resolve(friends);
+        });
+      });
+    }
+
+    user.posts.sort((a, b) => (a.date > b.date) ? -1 : 1);
+    enrichPosts(user.posts, user);
+    const randomFriends = getRandomFriends(user.friends);
+    const commentDetails = enrichComments(user.posts);
+    Promise.all([randomFriends, commentDetails]).then((val) => {
+      user.random_friends = val[0];
+      user.comment_details = val[1];
+      return res.statusJson(200, {user});
+    })
+
   })
 }
 

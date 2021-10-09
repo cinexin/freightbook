@@ -15,7 +15,7 @@
 
   <!-- Nav Item - Dashboard -->
   <li class="nav-item active">
-    <a class="nav-link" href="" routerLink="/profile">
+    <a class="nav-link" href="" routerLink="/profile/{{userData._id}}">
       <i class="far fa-address-card"></i>
       <span>Profile</span>
     </a>
@@ -79,7 +79,7 @@
     <div id="collapsePages" class="quick collapse" data-parent="#accordionSidebar">
       <div class="bg-white py-2 collapse-inner rounded">
         <h6 class="collapse-header"></h6>
-        <a class="collapse-item" href="" routerLink="/profile">Profile</a>
+        <a class="collapse-item" href="" routerLink="/profile/{{userData._id}}">Profile</a>
         <a class="collapse-item" href="" routerLink="/feed">Feed</a>
         <a class="collapse-item" href="" routerLink="/messages">Messages</a>
         <a (click)="logout()" class="collapse-item mt-3" href="" data-toggle="modal" data-target="#logoutModal">Sign Out</a>
