@@ -91,11 +91,11 @@ const generateFeed = (req, res) => {
       item.name = user.name;
       item.ago = timeAgo.ago(item.date);
       item.ownerProfileImage = user.profile_image;
-      item.ownerId = user.ownerId;
+      item.ownerId = user._id;
     }
   }
   const myPosts = new Promise((resolve, reject) => {
-    User.findById(userId, 'name posts friends', {lean: true}, (err, user) => {
+    User.findById(userId, 'name posts profile_image friends', {lean: true}, (err, user) => {
       if (err) {return res.json({err})}
       enrichPosts(user.posts, user)
       posts.push(...user.posts);
