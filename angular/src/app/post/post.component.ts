@@ -54,8 +54,7 @@ export class PostComponent implements OnInit {
   likeButtonClicked(postId: string): void {
     const requestObj = {
       location: `users/like-unlike/${this.post.ownerId}/${this.post._id}`,
-      type: 'POST',
-      authorize: true,
+      method: 'POST',
     };
     this.apiService.makeRequest(requestObj).then((val: any) => {
       if (this.post.likes.includes(this.userId)) {
@@ -73,8 +72,7 @@ export class PostComponent implements OnInit {
     console.log("POST COMMENT", this.comment);
     const requestObj = {
       location: `users/post-comment/${this.post.ownerId}/${this.post._id}`,
-      type: 'POST',
-      authorize: true,
+      method: 'POST',
       body: { content: this.comment }
     }
     this.apiService.makeRequest(requestObj).then((val: any) => {

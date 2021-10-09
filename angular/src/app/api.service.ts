@@ -25,8 +25,8 @@ export class ApiService {
   };
 
   public makeRequest(requestObject: any): any {
-    let type = requestObject.type.toLowerCase();
-    if (!type) {
+    let method = requestObject.method;
+    if (!method) {
       return console.log('No type specified in the request object.')
     }
 
@@ -40,19 +40,19 @@ export class ApiService {
 
     let httpOptions = {};
 
-    if (requestObject.authorize) {
+    if (this.localStorageService.getToken()) {
       httpOptions = {
         headers: new HttpHeaders({
           'Authorization': `Bearer ${this.localStorageService.getToken()}`
         })
       }
     }
-    if (type === 'get') {
+    if (method === 'GET') {
       return this.http.get(url, httpOptions).toPromise()
         .then(this.successHandler)
         .catch(this.errorHandler);
     }
-    if (type === 'post') {
+    if (method === 'POST') {
       return this.http.post(url, body, httpOptions).toPromise()
         .then(this.successHandler)
         .catch(this.errorHandler);
@@ -66,8 +66,7 @@ export class ApiService {
     console.log(`User ${from} is sending a friend request to user ${to}`)
     const requestObj = {
       location: `users/make-friend-request/${from}/${to}`,
-      type: `POST`,
-      authorize: true
+      method: `POST`
     };
     this.makeRequest(requestObj).then((val: any) => {
       if (val.statusCode === 201) {
@@ -85,8 +84,7 @@ export class ApiService {
     return new Promise((resolve, reject) => {
       const requestObj = {
         location: `users/resolve-friend-request/${id}/${to}?resolution=${resolution}`,
-        type: 'POST',
-        authorize: true
+        method: 'POST'
       };
       this.makeRequest(requestObj).then((val: any) => {
         if (val.statusCode === 200) {

@@ -31,8 +31,7 @@ export class PageFriendRequestsComponent implements OnInit {
       const friend_requests = JSON.stringify(this.userData.friend_requests);
       const requestObj = {
         location: `users/get-friend-requests?friend_requests=${friend_requests}`,
-        type: 'GET',
-        authorize: true
+        method: 'GET'
       }
       this.api.makeRequest(requestObj).then((val: any) => {
         if (val.statusCode === 200) {
