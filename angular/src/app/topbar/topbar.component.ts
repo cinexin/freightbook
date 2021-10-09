@@ -26,6 +26,8 @@ export class TopbarComponent implements OnInit {
   public usersName: string = '';
   public usersId = '';
   public alertMessage: string = '';
+  public profilePicture: string = 'default-avatar';
+
   public userData: any = {};
   public numOfFriendRequests: number = 0;
 
@@ -41,6 +43,7 @@ export class TopbarComponent implements OnInit {
     this.centralUserData.getUserData.subscribe((data) => {
       this.userData = data;
       this.numOfFriendRequests = data.friend_requests.length;
+      this.profilePicture = data.profile_image;
     });
     const requestObj = {
       location: `users/get-user-data/${this.usersId}`,

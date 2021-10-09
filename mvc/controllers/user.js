@@ -85,18 +85,19 @@ const generateFeed = (req, res) => {
   let posts = [];
   const maxAmountOfPosts = 38;
 
-  const enrichPosts = (posts, name, ownerId) => {
+  const enrichPosts = (posts, user) => {
     let item;
     for (item of posts) {
-      item.name = name;
+      item.name = user.name;
       item.ago = timeAgo.ago(item.date);
-      item.ownerId = ownerId;
+      item.ownerProfileImage = user.profile_image;
+      item.ownerId = user.ownerId;
     }
   }
   const myPosts = new Promise((resolve, reject) => {
     User.findById(userId, 'name posts friends', {lean: true}, (err, user) => {
       if (err) {return res.json({err})}
-      enrichPosts(user.posts, user.name, user._id)
+      enrichPosts(user.posts, user)
       posts.push(...user.posts);
       resolve(user.friends);
     });
@@ -104,12 +105,12 @@ const generateFeed = (req, res) => {
 
   const myFriendsPosts = myPosts.then((friendsArray) => {
     return new Promise((resolve, reject) => {
-      User.find({'_id': {$in: friendsArray}}, 'name posts', {lean: true}, (err, users) => {
+      User.find({'_id': {$in: friendsArray}}, 'name profile_image posts', {lean: true}, (err, users) => {
         if (err) { return res.json({err}); }
 
         let user;
         for (user of users) {
-          enrichPosts(user.posts, user.name, user._id)
+          enrichPosts(user.posts, user)
           posts.push(...user.posts);
         }
         resolve();
@@ -129,7 +130,7 @@ const generateFeed = (req, res) => {
 const getSearchResults = (req, res) => {
   const query = req.query;
   if (!query.query) { return res.json({err: 'Missing query'}); }
-  User.find({name: {$regex: query.query, $options: 'i'}}, 'name friends friend_requests', {},  (err, docs) => {
+  User.find({name: {$regex: query.query, $options: 'i'}}, 'name profile_image friends friend_requests', {},  (err, docs) => {
     if (err) {return res.json({err})}
     docs = docs.slice(0, 20);
     docs = docs.filter(i => i._id != req.user._id);
@@ -230,6 +231,7 @@ const createPost = ({body, user}, res) => {
     let newPost = post.toObject();
     newPost.name = user.name;
     newPost.ownerId = user._id;
+    newPost.ownerProfileImage = user.profile_image;
     user.posts.push(post);
     user.save((err) => {
       if (err) { return res.json(err) }

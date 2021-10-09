@@ -1,6 +1,6 @@
 <div *ngIf="post" class="card mt-4 shadow">
   <div class="card-header rounded-0">
-    <a href="#"><img class="profile-img-sm rounded-circle" src="/assets/images/f1.jpg"></a>
+    <a href="#"><img class="profile-img-sm rounded-circle" src="/assets/images/{{post.ownerProfileImage}}.jpg"></a>
     <span class="ml-3 h5"><a [ngClass]="'text-' + post.theme" class="link font-weight-700" href="#">{{post.name}}</a></span>
   </div>
   <div class="card-body">
@@ -34,7 +34,7 @@
 
           <div *ngFor="let comment of post.comments" class="comment p-3 my-2 rounded">
             <div class="comment-user">
-              <a href="#"><img src="/assets/images/f1.jpg" class="rounded-circle profile-img-sm"></a>
+              <a href="#"><img src="/assets/images/{{comment.commenter_profile_image}}.jpg" class="rounded-circle profile-img-sm"></a>
               <span class="ml-2">
                 <a href="#" class="link">
                   {{comment.commenter_name}}
