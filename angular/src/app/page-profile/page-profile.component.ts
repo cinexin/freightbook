@@ -31,6 +31,7 @@ export class PageProfileComponent implements OnInit {
 
      this.userDataService.getUserData.subscribe((user: any) => {
        this.activatedRoute.params.subscribe((params) => {
+         this.postsToShow = 6;
          if (user._id == params.userId) {
            console.log('Your profile');
            this.setComponentValues(user);
@@ -47,6 +48,9 @@ export class PageProfileComponent implements OnInit {
                this.canAddUser = user.friends.includes(data.user._id) ? false : true;
                this.haveReceivedFriendRequest = user.friend_requests.includes(data.user._id);
                this.haveSentFriendRequest = data.user.friend_requests.includes(user._id) ? true : false;
+               if (this.canAddUser) {
+                 this.postsToShow = 0;
+               }
                this.setComponentValues(data.user);
              }
            });
@@ -93,6 +97,7 @@ export class PageProfileComponent implements OnInit {
         this.haveReceivedFriendRequest = false;
         this.canAddUser = false;
         this.totalFriends++;
+        this.postsToShow = 6;
       }
     });
   }

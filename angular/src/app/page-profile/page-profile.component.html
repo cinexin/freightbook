@@ -58,7 +58,8 @@
         <div id="recent-posts" class="col-lg-5 col-md-6 mt-5 mt-md-0">
           <h3 class="text-success shadow py-3 text-center bg-white rounded-pill">Recent Posts</h3>
           <app-post *ngFor="let post of posts.slice(0, postsToShow)" [post]="post"></app-post>
-          <a (click)="showMorePosts()" *ngIf="posts.length && postsToShow < posts.length" class="bg-success d-block mt-4 py-3 text-center rounded-pill text-white link h5">Load More</a>
+          <a (click)="showMorePosts()" *ngIf="posts.length && postsToShow < posts.length && postsToShow > 0" class="bg-success d-block mt-4 py-3 text-center rounded-pill text-white link h5">Load More</a>
+          <h3 *ngIf="!postsToShow" class="text-center w-75 mx-auto mt-5 text-purple">Add this user as a friend to see its posts</h3>
           <div *ngIf="posts.length && postsToShow >= posts.length">
             <h2 class="mt-5 text-primary text-center">No more posts</h2>
             <a (click)="backToTop();" class="link h4 text-center block w-max mx-auto my-3">Back to top</a>
