@@ -12,10 +12,10 @@
   <div class="ml-auto mr-3 mt-3 align-self-start">
     <button *ngIf="useFor === 'results' && !haveSentFriendRequest && !haveReceivedFriendRequest && !isFriend" class="btn btn-sm btn-primary rounded-pill ml-1" (click)="makeFriendRequest(resultRequest._id); haveSentFriendRequest = true;">Add Friend</button>
     <button *ngIf="haveSentFriendRequest" class="btn btn-sm btn-warning rounded-pill ml-1" data-toggle="modal" data-target="#staticBackdrop">Friend request pending</button>
-    <button routerLink="/profile/{{resultRequest._id}}" *ngIf="isFriend" class="btn btn-sm btn-info rounded-pill ml-1" data-toggle="modal" data-target="#staticBackdrop">View profile</button>
-    <button *ngIf="useFor === 'request' || haveReceivedFriendRequest" class="btn btn-sm btn-primary rounded-pill ml-1" data-toggle="modal" data-target="#staticBackdrop" (click)="acceptFriendRequest(); haveReceivedFriendRequest=false; isFriend=true">Accept</button>
-    <button *ngIf="useFor === 'request' || haveReceivedFriendRequest" class="btn btn-sm btn-danger rounded-pill ml-1" data-toggle="modal" data-target="#staticBackdrop" (click)="declineFriendRequest(); haveReceivedFriendRequest=false">Decline</button>
-    <button class="btn btn-sm btn-success rounded-pill ml-1" data-toggle="modal" data-target="#staticBackdrop" (click)="sendMessage()">Send Message</button>
+    <button routerLink="/profile/{{resultRequest._id}}" *ngIf="isFriend" class="btn btn-sm btn-info rounded-pill ml-1">View profile</button>
+    <button *ngIf="useFor === 'request' || haveReceivedFriendRequest" class="btn btn-sm btn-primary rounded-pill ml-1" (click)="acceptFriendRequest(); haveReceivedFriendRequest=false; isFriend=true">Accept</button>
+    <button *ngIf="useFor === 'request' || haveReceivedFriendRequest" class="btn btn-sm btn-danger rounded-pill ml-1" (click)="declineFriendRequest(); haveReceivedFriendRequest=false">Decline</button>
+    <button class="btn btn-sm btn-success rounded-pill ml-1" data-toggle="modal" data-target="#staticBackdrop" (click)="updateSendMessageObject(resultRequest._id, resultRequest.name)">Send Message</button>
   </div>
 
 </div>

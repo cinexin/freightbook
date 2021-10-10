@@ -1,6 +1,7 @@
 import {Component, Input, OnInit, Output, EventEmitter} from '@angular/core';
 import {ApiService} from "../api.service";
 import {LocalStorageService} from "../local-storage.service";
+import {EventEmitterService} from "../event-emitter.service";
 
 @Component({
   selector: 'app-result-request',
@@ -14,7 +15,8 @@ export class ResultRequestComponent implements OnInit {
   @Output() resultRequestChange = new EventEmitter();
 
   constructor(
-    private api: ApiService
+    private api: ApiService,
+    private eventEmitterService: EventEmitterService
   ) {}
 
   ngOnInit(): void {
@@ -60,4 +62,7 @@ export class ResultRequestComponent implements OnInit {
     console.log('Send message to user,', this.resultRequest._id);
   }
 
+  updateSendMessageObject(id: string, name: string): void {
+    this.eventEmitterService.updateSendMessageObjectEvent.emit({ id, name})
+  }
 }

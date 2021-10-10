@@ -34,6 +34,11 @@ export class TopbarComponent implements OnInit {
   public userData: any = {};
   public numOfFriendRequests: number = 0;
 
+  public sendMessageObject: any = {
+    id: '',
+    name: ''
+  };
+
   private subscriptions: any[] = [];
 
   ngOnInit(): void {
@@ -57,12 +62,18 @@ export class TopbarComponent implements OnInit {
       location: `users/get-user-data/${this.usersId}`,
       method: 'GET',
     };
+    const updateMessageEvent = this.eventEmitterService.updateSendMessageObjectEvent.subscribe((data: any) => {
+      this.sendMessageObject.id = data.id;
+      this.sendMessageObject.name = data.name;
+    });
+    this.subscriptions.push(alertEvent, friendRequestEvent, userDataEvent, updateMessageEvent)
+
     this.api.makeRequest(requestObj).then((val: any) => {
       console.log(val);
       this.centralUserData.getUserData.emit(val.user);
     });
 
-    this.subscriptions.push(alertEvent, friendRequestEvent, userDataEvent)
+
   }
 
   public searchFriends() {
