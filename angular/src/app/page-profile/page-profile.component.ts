@@ -4,6 +4,7 @@ import {DOCUMENT} from "@angular/common";
 import {UserDataService} from "../user-data.service";
 import {ApiService} from "../api.service";
 import {ActivatedRoute} from "@angular/router";
+import {EventEmitterService} from "../event-emitter.service";
 
 @Component({
   selector: 'app-page-profile',
@@ -17,6 +18,7 @@ export class PageProfileComponent implements OnInit {
     private userDataService: UserDataService,
     private apiService: ApiService,
     private activatedRoute: ActivatedRoute,
+    private eventEmitterService: EventEmitterService,
     @Inject(DOCUMENT) private document: Document
   ) { }
 
@@ -41,6 +43,9 @@ export class PageProfileComponent implements OnInit {
            }
            this.apiService.makeRequest(requestObj).then((data: any) => {
              if (data.statusCode == 200) {
+               this.canAddUser = user.friends.includes(data.user._id) ? false : true;
+               this.haveReceivedFriendRequest = user.friend_requests.includes(data.user._id);
+               this.haveSentFriendRequest = data.user.friend_requests.includes(user._id) ? true : false;
                this.setComponentValues(data.user);
              }
            });
@@ -53,11 +58,14 @@ export class PageProfileComponent implements OnInit {
   public totalFriends: number = 0;
   public posts: object[] = [];
   public profilePicture: string = 'default-avatar';
-  public usersName: string = '';
-  public usersEmail: string = '';
+  public userName: string = '';
+  public userEmail: string = '';
+  public userId: string = '';
 
   public canAddUser: boolean = false;
   public canSendMessage: boolean = false;
+  public haveSentFriendRequest: boolean = false;
+  public haveReceivedFriendRequest: boolean = false;
   public postsToShow: number = 6;
 
   showMorePosts(): void {
@@ -72,8 +80,27 @@ export class PageProfileComponent implements OnInit {
     this.randomFriends = user.random_friends;
     this.profilePicture = user.profile_image;
     this.posts = user.posts;
-    this.usersName = user.name;
-    this.usersEmail = user.email;
+    this.userName = user.name;
+    this.userEmail = user.email;
     this.totalFriends = user.friends.length;
+    this.userId = user._id;
+  }
+
+  acceptFriendRequest(): void {
+    this.apiService.resolveFriendRequest('accept', this.userId).then((val: any) => {
+      if (val.statusCode == 200) {
+        this.haveReceivedFriendRequest = false;
+        this.canAddUser = false;
+        this.totalFriends++;
+      }
+    });
+  }
+
+  declineFriendRequest(): void {
+    this.apiService.resolveFriendRequest('decline', this.userId).then((val: any) => {
+      if (val.statusCode == 200) {
+        this.haveReceivedFriendRequest = false;
+      }
+    });
   }
 }

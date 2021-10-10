@@ -68,14 +68,18 @@ export class ApiService {
       location: `users/make-friend-request/${from}/${to}`,
       method: `POST`
     };
-    this.makeRequest(requestObj).then((val: any) => {
-      if (val.statusCode === 201) {
-        this.eventEmitterService.onAlertEvent.emit('Friend request successfully sent');
-      } else {
-        this.eventEmitterService.onAlertEvent.emit('Something went wrong');
-      }
-    }).catch((err: any) => {
-      this.eventEmitterService.onAlertEvent.emit('Some error occurred in the API call: ${err}')
+    return new Promise((resolve, reject) => {
+      this.makeRequest(requestObj).then((val: any) => {
+        if (val.statusCode === 201) {
+          this.eventEmitterService.onAlertEvent.emit('Friend request successfully sent');
+        } else {
+          this.eventEmitterService.onAlertEvent.emit('Something went wrong');
+        }
+        resolve(val)
+      }).catch((err: any) => {
+        this.eventEmitterService.onAlertEvent.emit('Some error occurred in the API call: ${err}')
+        reject(err);
+      });
     });
   }
 
