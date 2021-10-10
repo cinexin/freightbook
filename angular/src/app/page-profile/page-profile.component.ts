@@ -26,14 +26,26 @@ export class PageProfileComponent implements OnInit {
     if (sidebar) {
       sidebar.classList.add('d-none');
     }
-    const paramId = this.activatedRoute.snapshot.params.userId;
+
      this.userDataService.getUserData.subscribe((user: any) => {
-       if (user._id == paramId) {
-         console.log('Your profile');
-         this.setComponentValues(user);
-       } else {
-         console.log('Not your profile');
-       }
+       this.activatedRoute.params.subscribe((params) => {
+         if (user._id == params.userId) {
+           console.log('Your profile');
+           this.setComponentValues(user);
+         } else {
+           console.log('Not your profile');
+           this.canSendMessage = true;
+           const requestObj = {
+             location: `users/get-user-data/${params.userId}`,
+             method: 'GET'
+           }
+           this.apiService.makeRequest(requestObj).then((data: any) => {
+             if (data.statusCode == 200) {
+               this.setComponentValues(data.user);
+             }
+           });
+         }
+       })
      });
   }
 
@@ -45,7 +57,7 @@ export class PageProfileComponent implements OnInit {
   public usersEmail: string = '';
 
   public canAddUser: boolean = false;
-  public canSendMessage: boolean = true;
+  public canSendMessage: boolean = false;
   public postsToShow: number = 6;
 
   showMorePosts(): void {
