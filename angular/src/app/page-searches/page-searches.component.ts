@@ -4,13 +4,17 @@ import {ActivatedRoute} from "@angular/router";
 import {Title} from "@angular/platform-browser";
 import {DOCUMENT} from "@angular/common";
 import {UserDataService} from "../user-data.service";
+import {AutoUnsubscribe} from "../unsubscribe";
 
 @Component({
   selector: 'app-page-searches',
   templateUrl: './page-searches.component.html',
   styleUrls: ['./page-searches.component.css']
 })
+@AutoUnsubscribe
 export class PageSearchesComponent implements OnInit {
+
+  private subscriptions: any[] = [];
 
   constructor(
     private apiService: ApiService,
@@ -26,12 +30,14 @@ export class PageSearchesComponent implements OnInit {
       sidebar.classList.add('d-none');
     }
     this.title.setTitle('Search results');
-    this.centralUserData.getUserData.subscribe((data) => {
-      this.subscription = this.route.params.subscribe(params => {
+    const userDataSubscription = this.centralUserData.getUserData.subscribe((data) => {
+      const paramsSubscription = this.subscription = this.route.params.subscribe(params => {
         this.query = params.query;
         this.user = data;
         this.getResults();
       });
+      this.subscriptions.push(userDataSubscription);
+      this.subscriptions.push(paramsSubscription);
     });
   }
 
@@ -39,6 +45,7 @@ export class PageSearchesComponent implements OnInit {
   public query = this.route.snapshot.params.query;
   public subscription: any;
   private user: any;
+
 
   private getResults() {
     const requestObj = {

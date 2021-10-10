@@ -3,15 +3,18 @@ import {UserDataService} from "../user-data.service";
 import {ApiService} from "../api.service";
 import {Title} from "@angular/platform-browser";
 import {DOCUMENT} from "@angular/common";
+import {AutoUnsubscribe} from "../unsubscribe";
 
 @Component({
   selector: 'app-page-friend-requests',
   templateUrl: './page-friend-requests.component.html',
   styleUrls: ['./page-friend-requests.component.css']
 })
+@AutoUnsubscribe
 export class PageFriendRequestsComponent implements OnInit {
   userData: any = {};
   friendRequests = [];
+  private subscriptions: any[] = [];
 
   constructor(
     private centralUserData: UserDataService,
@@ -26,7 +29,7 @@ export class PageFriendRequestsComponent implements OnInit {
       sidebar.classList.add('d-none');
     }
     this.title.setTitle('Freightbook - Friend Requests');
-    this.centralUserData.getUserData.subscribe((data) => {
+    const userDataSubscription = this.centralUserData.getUserData.subscribe((data) => {
       this.userData = data;
       const friend_requests = JSON.stringify(this.userData.friend_requests);
       const requestObj = {
@@ -39,6 +42,7 @@ export class PageFriendRequestsComponent implements OnInit {
         }
       });
     });
+    this.subscriptions.push(userDataSubscription);
   }
 
   updateFriendRequests(id: string) {

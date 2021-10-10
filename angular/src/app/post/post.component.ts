@@ -23,7 +23,6 @@ export class PostComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    console.log(`Likes: ${this.post.likes}`);
     const removeLeadingNumbers = (s: string) => {
       const isNumber = (n: any) => {
         n = Number(n);

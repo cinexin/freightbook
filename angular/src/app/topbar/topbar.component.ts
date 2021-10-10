@@ -1,16 +1,18 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {AuthService} from "../auth.service";
 import {Router} from "@angular/router";
 import {LocalStorageService} from "../local-storage.service";
 import {EventEmitterService} from "../event-emitter.service";
 import {UserDataService} from "../user-data.service";
 import {ApiService} from "../api.service";
+import {AutoUnsubscribe} from "../unsubscribe";
 
 @Component({
   selector: 'app-topbar',
   templateUrl: './topbar.component.html',
   styleUrls: ['./topbar.component.css']
 })
+@AutoUnsubscribe
 export class TopbarComponent implements OnInit {
 
   constructor(
@@ -22,6 +24,7 @@ export class TopbarComponent implements OnInit {
     private api: ApiService
   ) { }
 
+
   public query: string = '';
   public usersName: string = '';
   public usersId = '';
@@ -31,16 +34,21 @@ export class TopbarComponent implements OnInit {
   public userData: any = {};
   public numOfFriendRequests: number = 0;
 
+  private subscriptions: any[] = [];
+
   ngOnInit(): void {
     this.usersName = this.localStorageService.getParsedToken().name;
     this.usersId = this.localStorageService.getParsedToken()._id;
-    this.eventEmitterService.onAlertEvent.subscribe((msg: string) => {
+
+    const alertEvent  = this.eventEmitterService.onAlertEvent.subscribe((msg: string) => {
       this.alertMessage = msg;
     });
-    this.eventEmitterService.updateNumOfFriendRequestsEvent.subscribe(() => {
+
+    const friendRequestEvent = this.eventEmitterService.updateNumOfFriendRequestsEvent.subscribe(() => {
       this.numOfFriendRequests--;
     });
-    this.centralUserData.getUserData.subscribe((data) => {
+
+    const userDataEvent = this.centralUserData.getUserData.subscribe((data) => {
       this.userData = data;
       this.numOfFriendRequests = data.friend_requests.length;
       this.profilePicture = data.profile_image;
@@ -54,6 +62,7 @@ export class TopbarComponent implements OnInit {
       this.centralUserData.getUserData.emit(val.user);
     });
 
+    this.subscriptions.push(alertEvent, friendRequestEvent, userDataEvent)
   }
 
   public searchFriends() {
