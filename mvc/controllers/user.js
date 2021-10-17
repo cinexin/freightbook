@@ -3,8 +3,8 @@ const mongoose = require('mongoose');
 const User = mongoose.model('User');
 const Post = mongoose.model('Post');
 const Comment = mongoose.model('Comment');
+const Message = mongoose.model('Message');
 const timeAgo = require('time-ago');
-const {random} = require("mongoose/lib/utils");
 
 const containsDuplicate = (array) =>  new Set(array).size !== array.length;
 const getRandom = (min, max) => {
@@ -323,6 +323,74 @@ const commentOnPost = (req, res) => {
 
 }
 
+const sendMessage = (req, res) => {
+  let from = req.user._id;
+  let to = req.params.to;
+
+  const fromPromise = new Promise((resolve, reject) => {
+    User.findById(from, "messages", (err, user) => {
+      if (err) { reject( err); return res.json({err}) }
+      from = user
+      resolve(user)
+    });
+  });
+
+  const toPromise = new Promise((resolve, reject) => {
+    User.findById(to, "messages", (err, user) => {
+      if (err) { reject( err); return res.json({err}) }
+      to = user
+      resolve(user)
+    });
+  });
+
+  const sendMessagePromise = Promise.all([fromPromise, toPromise]).then(() => {
+    const hasMessageFrom = (messages, id) => {
+      return messages.find((message) => message.from_id == id);
+    }
+
+    const sendMessageTo = (to, from) => {
+      return new Promise((resolve, reject) => {
+        let foundMessage;
+        if (foundMessage = hasMessageFrom(to.messages, from._id)) {
+          foundMessage.content.push(message);
+          to.save((err, user) => {
+            if (err) { reject(err); return res.json({err}); }
+            resolve(user);
+          });
+        } else {
+          const newMessage = new Message();
+          newMessage.from_id = from._id;
+          newMessage.content = [message];
+
+          to.messages.push(newMessage);
+          to.save((err, user) => {
+            if (err) { reject(err); return res.json({err}); }
+            resolve(user);
+          });
+        }
+      });
+    }
+
+    const message = {
+      messenger: from._id,
+      message: req.body.content,
+    }
+    const saveMessageToRecipient = sendMessageTo(to, from);
+    const saveMessageToAuthor = sendMessageTo(from, to);
+    return new Promise((resolve, reject) => {
+      Promise.all([saveMessageToRecipient, saveMessageToAuthor]).then(() => {
+        resolve();
+      });
+    });
+  });
+
+  sendMessagePromise.then(() => {
+    return res.statusJson(201, {
+      message: 'Sending message',
+    });
+  });
+}
+
 const getAllUsers = (req, res) => {
   User.find({},{}, {}, (err, users) => {
     if (err) { return res.send({error: err})}
@@ -350,5 +418,6 @@ module.exports = {
   resolveFriendRequest,
   createPost,
   likeUnlike,
-  commentOnPost
+  commentOnPost,
+  sendMessage
 }

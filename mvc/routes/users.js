@@ -18,6 +18,7 @@ router.post('/resolve-friend-request/:from/:to', middleware.authorize, usersCtrl
 router.post('/create-post', middleware.authorize, usersCtrl.createPost);
 router.post('/like-unlike/:ownerId/:postId', middleware.authorize, usersCtrl.likeUnlike);
 router.post('/post-comment/:ownerId/:postId', middleware.authorize, usersCtrl.commentOnPost);
+router.post('/send-message/:to', middleware.authorize, usersCtrl.sendMessage);
 
 
 router.post('/create-fake-users', fakeUsersCtrl.createFakeUsers);

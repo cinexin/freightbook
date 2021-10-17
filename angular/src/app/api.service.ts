@@ -104,4 +104,28 @@ export class ApiService {
       });
     });
   }
+
+  public sendMessage(sendMessageObject: any): Promise<any> | void {
+    if (!sendMessageObject.content) {
+      this.eventEmitterService.onAlertEvent.emit('Message not sent. Empty message')
+      return;
+    }
+
+    let requestObj = {
+      location: `users/send-message/${sendMessageObject.id}`,
+      method: 'POST',
+      body: {
+        content: sendMessageObject.content
+      }
+    }
+    return new Promise((resolve, reject) => {
+      this.makeRequest(requestObj).then((val: any) => {
+        console.log(val);
+        if (val.statusCode === 201) {
+          this.eventEmitterService.onAlertEvent.emit('Message sent successfully');
+        }
+        resolve(val);
+      });
+    })
+  }
 }

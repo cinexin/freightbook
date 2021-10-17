@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {AuthService} from "../auth.service";
 import {Router} from "@angular/router";
 import {LocalStorageService} from "../local-storage.service";
@@ -36,7 +36,8 @@ export class TopbarComponent implements OnInit {
 
   public sendMessageObject: any = {
     id: '',
-    name: ''
+    name: '',
+    content: ''
   };
 
   private subscriptions: any[] = [];
@@ -79,6 +80,11 @@ export class TopbarComponent implements OnInit {
   public searchFriends() {
     console.log('Searching friends...');
     this.router.navigate(['/search-results', {query: this.query}]);
+  }
+
+  sendMessage(): void {
+    this.api.sendMessage(this.sendMessageObject);
+    this.sendMessageObject.content = '';
   }
 
   public logout(): void {

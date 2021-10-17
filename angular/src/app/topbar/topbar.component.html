@@ -205,12 +205,13 @@
       </div>
       <div class="modal-body">
         <form class="" action="index.html" method="post" id="send-message">
-          <textarea name="name" placeholder="Your message..." rows="6" class="w-100" required></textarea>
+          <textarea name="name" placeholder="Your message..." rows="6" class="w-100" required [(ngModel)]="sendMessageObject.content" >
+          </textarea>
         </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Nevermind</button>
-        <button type="submit" class="btn btn-primary" form="send-message">Send Message</button>
+        <button type="submit" class="btn btn-primary" form="send-message" (click)="sendMessage()">Send Message</button>
       </div>
     </div>
   </div>
