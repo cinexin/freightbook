@@ -44,8 +44,8 @@
     <li class="nav-item dropdown no-arrow mx-1">
       <a class="nav-link dropdown-toggle" href="" routerLink="/friend-requests">
         <i class="fa fa-users"></i>
-        <span *ngIf="numOfFriendRequests" class="badge badge-danger badge-counter">
-          {{numOfFriendRequests}}
+        <span *ngIf="notifications.friendRequests" class="badge badge-danger badge-counter">
+          {{notifications.friendRequests}}
         </span>
       </a>
     </li>
@@ -54,8 +54,8 @@
       <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <i class="fas fa-bell fa-fw"></i>
         <!-- Counter - Alerts -->
-        <span *ngIf="userData.new_notifications" class="badge badge-danger badge-counter">
-          {{userData.new_notifications}}+
+        <span *ngIf="notifications.alerts" class="badge badge-danger badge-counter">
+          {{notifications.alerts}}+
         </span>
       </a>
       <!-- Dropdown - Alerts -->
@@ -105,8 +105,8 @@
       <a class="nav-link dropdown-toggle" href="#" id="messagesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <i class="fas fa-envelope fa-fw"></i>
         <!-- Counter - Messages -->
-        <span *ngIf="userData.new_message_notifications" class="badge badge-danger badge-counter">
-          {{userData.new_message_notifications}}
+        <span *ngIf="notifications.messages" class="badge badge-danger badge-counter">
+          {{notifications.messages}}
         </span>
       </a>
       <!-- Dropdown - Messages -->
@@ -168,7 +168,7 @@
       </a>
       <!-- Dropdown - User Information -->
       <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
-        <a class="dropdown-item" href="" routerLink="/profile/{{userData._id}}">
+        <a class="dropdown-item" href="" routerLink="/profile/{{usersId}}">
           <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
           Profile
         </a>

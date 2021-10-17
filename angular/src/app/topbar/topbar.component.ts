@@ -25,22 +25,25 @@ export class TopbarComponent implements OnInit {
   ) { }
 
 
+  private subscriptions: any[] = [];
   public query: string = '';
-  public usersName: string = '';
-  public usersId = '';
-  public alertMessage: string = '';
-  public profilePicture: string = 'default-avatar';
-
-  public userData: any = {};
-  public numOfFriendRequests: number = 0;
-
   public sendMessageObject: any = {
     id: '',
     name: '',
     content: ''
-  };
+  }
+  public alertMessage: string = '';
 
-  private subscriptions: any[] = [];
+  // User Data
+  public usersName: string = '';
+  public usersId = '';
+  public profilePicture: string = 'default-avatar';
+  public messagePreviews = [];
+  public notifications = {
+    alerts: 0,
+    friendRequests: 0,
+    messages: 0,
+  }
 
   ngOnInit(): void {
     this.usersName = this.localStorageService.getParsedToken().name;
@@ -51,13 +54,13 @@ export class TopbarComponent implements OnInit {
     });
 
     const friendRequestEvent = this.eventEmitterService.updateNumOfFriendRequestsEvent.subscribe(() => {
-      this.numOfFriendRequests--;
+      this.notifications.friendRequests--;
     });
 
-    const userDataEvent = this.centralUserData.getUserData.subscribe((data) => {
-      this.userData = data;
-      this.numOfFriendRequests = data.friend_requests.length;
-      this.profilePicture = data.profile_image;
+    const userDataEvent = this.centralUserData.getUserData.subscribe((user) => {
+      this.notifications.friendRequests = user.friend_requests.length;
+      this.notifications.messages = user.new_message_notifications.length;
+      this.profilePicture = user.profile_image;
     });
     const requestObj = {
       location: `users/get-user-data/${this.usersId}`,
