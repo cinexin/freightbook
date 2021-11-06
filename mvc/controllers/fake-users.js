@@ -644,7 +644,6 @@ const createFakeUsers = (req, res) => {
     return new Promise(function (resolve, reject) {
       Promise.all(promises).then((val) => {
         resolve(val);
-        res.statusJson(201, {message: 'Fake users created'})
       });
     });
   }
