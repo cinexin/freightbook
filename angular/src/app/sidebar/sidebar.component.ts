@@ -1,8 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {AuthService} from "../auth.service";
 import {UserDataService} from "../user-data.service";
 import {AutoUnsubscribe} from "../unsubscribe";
-import {error} from "protractor";
 
 @Component({
   selector: 'app-sidebar',

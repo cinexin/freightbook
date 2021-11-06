@@ -1,6 +1,5 @@
-import {Component, Input, OnInit, Output, EventEmitter} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {ApiService} from "../api.service";
-import {LocalStorageService} from "../local-storage.service";
 import {EventEmitterService} from "../event-emitter.service";
 
 @Component({

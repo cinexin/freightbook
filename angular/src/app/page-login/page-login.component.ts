@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-import { ApiService } from "../api.service";
-import { LocalStorageService } from "../local-storage.service";
-import { Router } from "@angular/router";
+import {Component, OnInit} from '@angular/core';
+import {ApiService} from "../api.service";
+import {LocalStorageService} from "../local-storage.service";
+import {Router} from "@angular/router";
 import {Title} from "@angular/platform-browser";
 
 @Component({

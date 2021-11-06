@@ -1,8 +1,6 @@
-const passport = require('passport');
 const mongoose = require('mongoose');
 const User = mongoose.model('User');
 const Post = mongoose.model('Post')
-const Comment = mongoose.model('Comment');
 
 const maleNames = [
   "Jesse",

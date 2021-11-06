@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
-import { CanActivate, Router, RouterStateSnapshot, ActivatedRouteSnapshot } from "@angular/router";
-import {LocalStorageService } from "./local-storage.service";
+import {Injectable} from '@angular/core';
+import {ActivatedRouteSnapshot, Router, RouterStateSnapshot} from "@angular/router";
+import {LocalStorageService} from "./local-storage.service";
 
 @Injectable({
   providedIn: 'root'

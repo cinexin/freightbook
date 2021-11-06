@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from "@angular/common/http";
-import { LocalStorageService } from "./local-storage.service";
+import {Injectable} from '@angular/core';
+import {HttpClient, HttpHeaders} from "@angular/common/http";
+import {LocalStorageService} from "./local-storage.service";
 import {EventEmitterService} from "./event-emitter.service";
 
 @Injectable({
