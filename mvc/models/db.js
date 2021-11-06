@@ -1,8 +1,10 @@
 const mongoose = require('mongoose');
-let dbURI = 'mongodb://mongoadmin:secret@localhost:27017/freightbook?authSource=admin';
+
+let dbURI = process.env.MONGODB_URI;
 
 
 if (process.env.NODE_ENV === 'production') {
+  require('dotenv').config({ path: `.env.${process.env.NODE_ENV}` })
   dbURI = process.env.MONGODB_URI;
 }
 
