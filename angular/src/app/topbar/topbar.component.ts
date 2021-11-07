@@ -70,14 +70,15 @@ export class TopbarComponent implements OnInit {
       this.sendMessageObject.id = data.id;
       this.sendMessageObject.name = data.name;
     });
-    this.subscriptions.push(alertEvent, friendRequestEvent, userDataEvent, updateMessageEvent)
+    const resetMessagesEvent = this.eventEmitterService.resetMessageNotificationsEvent.subscribe(() => {
+      this.notifications.messages = 0;
+    });
+    this.subscriptions.push(alertEvent, friendRequestEvent, userDataEvent, updateMessageEvent, resetMessagesEvent)
 
     this.api.makeRequest(requestObj).then((val: any) => {
       console.log(val);
       this.centralUserData.getUserData.emit(val.user);
     });
-
-
   }
 
   public searchFriends() {
@@ -88,6 +89,10 @@ export class TopbarComponent implements OnInit {
   sendMessage(): void {
     this.api.sendMessage(this.sendMessageObject);
     this.sendMessageObject.content = '';
+  }
+
+  resetMessageNotifications() {
+    this.api.resetMessageNotifications();
   }
 
   public logout(): void {

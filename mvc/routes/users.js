@@ -19,6 +19,7 @@ router.post('/create-post', middleware.authorize, usersCtrl.createPost);
 router.post('/like-unlike/:ownerId/:postId', middleware.authorize, usersCtrl.likeUnlike);
 router.post('/post-comment/:ownerId/:postId', middleware.authorize, usersCtrl.commentOnPost);
 router.post('/send-message/:to', middleware.authorize, usersCtrl.sendMessage);
+router.post('/reset-message-notifications', middleware.authorize, usersCtrl.resetMessageNotifications);
 
 
 router.post('/create-fake-users', fakeUsersCtrl.createFakeUsers);

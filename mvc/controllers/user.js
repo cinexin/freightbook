@@ -336,7 +336,7 @@ const sendMessage = (req, res) => {
   });
 
   const toPromise = new Promise((resolve, reject) => {
-    User.findById(to, "messages", (err, user) => {
+    User.findById(to, "messages new_message_notifications", (err, user) => {
       if (err) { reject( err); return res.json({err}) }
       to = user
       resolve(user)
@@ -348,8 +348,12 @@ const sendMessage = (req, res) => {
       return messages.find((message) => message.from_id == id);
     }
 
-    const sendMessageTo = (to, from) => {
+    const sendMessageTo = (to, from, notify = false) => {
       return new Promise((resolve, reject) => {
+        if (notify && !to.new_message_notifications.includes(from._id)) {
+          to.new_message_notifications.push(from._id);
+        }
+
         let foundMessage;
         if (foundMessage = hasMessageFrom(to.messages, from._id)) {
           foundMessage.content.push(message);
@@ -375,7 +379,7 @@ const sendMessage = (req, res) => {
       messenger: from._id,
       message: req.body.content,
     }
-    const saveMessageToRecipient = sendMessageTo(to, from);
+    const saveMessageToRecipient = sendMessageTo(to, from, true);
     const saveMessageToAuthor = sendMessageTo(from, to);
     return new Promise((resolve, reject) => {
       Promise.all([saveMessageToRecipient, saveMessageToAuthor]).then(() => {
@@ -387,6 +391,19 @@ const sendMessage = (req, res) => {
   sendMessagePromise.then(() => {
     return res.statusJson(201, {
       message: 'Sending message',
+    });
+  });
+}
+
+const resetMessageNotifications = (req, res) => {
+  const userId = req.user._id;
+  User.findById(userId, (err, user) => {
+    if (err) { return res.json({err}) }
+
+    user.new_message_notifications = [];
+    user.save((err ) => {
+      if (err) { return res.json({err}) }
+      return res.statusJson(200, { message: 'Reset messages notifications' });
     });
   });
 }
@@ -419,5 +436,6 @@ module.exports = {
   createPost,
   likeUnlike,
   commentOnPost,
-  sendMessage
+  sendMessage,
+  resetMessageNotifications
 }

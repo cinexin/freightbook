@@ -128,4 +128,20 @@ export class ApiService {
       });
     })
   }
+
+  public resetMessageNotifications() {
+    const requestObj = {
+      location: 'users/reset-message-notifications',
+      method: 'POST',
+    }
+
+    return new Promise((resolve, reject) => {
+      this.makeRequest(requestObj).then((val: any) => {
+        if (val.statusCode == 200) {
+          this.eventEmitterService.resetMessageNotificationsEvent.emit();
+        }
+        resolve(val);
+      });
+    });
+  }
 }
