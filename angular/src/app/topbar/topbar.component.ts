@@ -38,7 +38,7 @@ export class TopbarComponent implements OnInit {
   public usersName: string = '';
   public usersId = '';
   public profilePicture: string = 'default-avatar';
-  public messagePreviews = [];
+  public messagePreviews: any[] = [];
   public notifications = {
     alerts: 0,
     friendRequests: 0,
@@ -61,6 +61,8 @@ export class TopbarComponent implements OnInit {
       this.notifications.friendRequests = user.friend_requests.length;
       this.notifications.messages = user.new_message_notifications.length;
       this.profilePicture = user.profile_image;
+      this.setMessagePreviews(user.messages, user.new_message_notifications);
+      console.log(this.messagePreviews);
     });
     const requestObj = {
       location: `users/get-user-data/${this.usersId}`,
@@ -93,6 +95,34 @@ export class TopbarComponent implements OnInit {
 
   resetMessageNotifications() {
     this.api.resetMessageNotifications();
+  }
+
+  private setMessagePreviews(messages: any[], messageNotifications: any[]): void {
+    for (let i = messages.length - 1; i >= 0; i--) {
+      const lastMessage = messages[i].content[messages[i].content.length - 1];
+      const preview = {
+        messengerName: messages[i].messengerName,
+        messageContent: lastMessage.message,
+        messengerImage: '',
+        messengerId: messages[i].from_id,
+        isNew: false
+      }
+
+      if (lastMessage.messenger == this.usersId) {
+        preview.messengerImage = this.profilePicture;
+      } else {
+        preview.messengerImage = messages[i].messengerProfileImage;
+        if (messageNotifications.includes(messages[i].from_id)) {
+          preview.isNew = true;
+        }
+      }
+
+      if (preview.isNew) {
+        this.messagePreviews.unshift(preview);
+      } else {
+        this.messagePreviews.push(preview);
+      }
+    }
   }
 
   public logout(): void {

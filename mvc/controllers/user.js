@@ -190,14 +190,37 @@ const getUserData = ({params}, res) => {
         });
       });
     }
+    const addMessengerDetails = (messages) => {
+      return new Promise((resolve, reject) => {
+        if (!messages.length) { resolve(messages) }
 
+        const usersArray = messages.map(message => message.from_id);
+        User.find({'_id': {$in: usersArray}}, "name profile_image", (err, users) => {
+          if (err) { return res.json({err}) }
+
+          for (message of messages) {
+            for (let i=0; i < users.length; i++) {
+              if (message.from_id == users[i]._id) {
+                message.messengerName = users[i].name;
+                message.messengerProfileImage = users[i].profile_image;
+                users.splice(i, 1);
+                break;
+              }
+            }
+          }
+          resolve(messages);
+        });
+      });
+    }
     user.posts.sort((a, b) => (a.date > b.date) ? -1 : 1);
     enrichPosts(user.posts, user);
     const randomFriends = getRandomFriends(user.friends);
     const commentDetails = enrichComments(user.posts);
-    Promise.all([randomFriends, commentDetails]).then((val) => {
+    const messageDetails = addMessengerDetails(user.messages);
+    Promise.all([randomFriends, commentDetails, messageDetails]).then((val) => {
       user.random_friends = val[0];
       user.comment_details = val[1];
+      user.messages = val[2];
       return res.statusJson(200, {user});
     })
 
