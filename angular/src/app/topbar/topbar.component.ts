@@ -125,6 +125,10 @@ export class TopbarComponent implements OnInit {
     }
   }
 
+  messageLink(messageId: any) {
+    this.router.navigate(['/messages'], {state: {data: {msgId: messageId}}});
+  }
+
   public logout(): void {
     this.authService.logout();
   }
