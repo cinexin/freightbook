@@ -105,10 +105,12 @@ export class ApiService {
     });
   }
 
-  public sendMessage(sendMessageObject: any): Promise<any> | void {
+  public sendMessage(sendMessageObject: any, showAlerts: boolean = true): Promise<any> {
     if (!sendMessageObject.content) {
-      this.eventEmitterService.onAlertEvent.emit('Message not sent. Empty message')
-      return;
+      if (showAlerts) {
+        this.eventEmitterService.onAlertEvent.emit('Message not sent. Empty message')
+      }
+      return Promise.resolve();
     }
 
     let requestObj = {
@@ -118,11 +120,13 @@ export class ApiService {
         content: sendMessageObject.content
       }
     }
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       this.makeRequest(requestObj).then((val: any) => {
         console.log(val);
         if (val.statusCode === 201) {
-          this.eventEmitterService.onAlertEvent.emit('Message sent successfully');
+          if (showAlerts) {
+            this.eventEmitterService.onAlertEvent.emit('Message sent successfully');
+          }
         }
         resolve(val);
       });
