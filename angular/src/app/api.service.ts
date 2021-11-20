@@ -57,6 +57,11 @@ export class ApiService {
         .then(this.successHandler)
         .catch(this.errorHandler);
     }
+    if (method === 'DELETE') {
+      return this.http.delete(url, httpOptions).toPromise()
+        .then(this.successHandler)
+        .catch(this.errorHandler);
+    }
 
     console.log('Could not make the request. Make sure a type of GET or POST is supplied.');
   }

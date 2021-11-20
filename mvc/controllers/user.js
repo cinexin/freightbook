@@ -438,6 +438,19 @@ const getAllUsers = (req, res) => {
   });
 }
 
+const deleteMessage = (req, res) => {
+  const messageId = req.params.id;
+  const userId = req.user._id;
+  User.findById(userId, (err, user) => {
+    if (err) {return res.json({err: err});}
+    user.messages.id(messageId).remove();
+    user.save((err) => {
+      if (err) {return res.json({err: err});}
+      return res.statusJson(204, {message: 'Chat deleted'});
+    });
+  })
+}
+
 const deleteAllUsers = (req, res) => {
   User.deleteMany({},{}, (err) => {
     if (err) { return res.send({error: err})}
@@ -460,5 +473,6 @@ module.exports = {
   likeUnlike,
   commentOnPost,
   sendMessage,
-  resetMessageNotifications
+  resetMessageNotifications,
+  deleteMessage,
 }

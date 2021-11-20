@@ -1,9 +1,9 @@
-import {Component, OnInit} from '@angular/core';
+import {AfterViewChecked, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {Title} from "@angular/platform-browser";
 import {ApiService} from "../api.service";
 import {UserDataService} from "../user-data.service";
 import {AutoUnsubscribe} from "../unsubscribe";
-import {Message} from "@angular/compiler/src/i18n/i18n_ast";
+import {EventEmitterService} from "../event-emitter.service";
 
 class MessagesGroup {
   constructor(
@@ -22,12 +22,15 @@ class MessagesGroup {
   styleUrls: ['./page-messages.component.css']
 })
 @AutoUnsubscribe
-export class PageMessagesComponent implements OnInit {
+export class PageMessagesComponent implements OnInit, AfterViewChecked {
+
+  @ViewChild('scrollMe') private chatContainer: ElementRef | undefined;
 
   constructor(
     private title: Title,
     private apiService: ApiService,
-    private centralUserData: UserDataService
+    private centralUserData: UserDataService,
+    private eventService: EventEmitterService,
   ) { }
 
   ngOnInit(): void {
@@ -38,8 +41,9 @@ export class PageMessagesComponent implements OnInit {
       this.activeMessage.fromId = history.state.data.msgId;
     }
     const userDataEvent = this.centralUserData.getUserData.subscribe((user) => {
+      if (!user.messages.length) {return; }
       this.activeMessage.fromId = this.activeMessage.fromId || user.messages[0].from_id;
-      this.messages = user.messages;
+      this.messages = user.messages.reverse();
       this.usersName = user.name;
       this.usersId = user._id;
       this.usersProfileImage = user.profile_image;
@@ -97,6 +101,22 @@ export class PageMessagesComponent implements OnInit {
     });
   }
 
+  deleteMessage(msgId: string): void {
+    console.log('Delete Msg', msgId);
+    const requestObj = {
+      location: `users/messages/${msgId}`,
+      method: 'DELETE',
+    }
+    this.apiService.makeRequest(requestObj).then(() => {
+      const removeIdx = this.messages.findIndex((message) => message._id === msgId);
+      this.messages.splice(removeIdx, 1);
+      this.setActiveMessage(this.messages[0].from_id);
+    }).catch((error: string) => {
+      this.eventService.onAlertEvent.emit('Error deleting chat');
+      console.error('Error occurred deleting the chat', error);
+    });
+  }
+
   setActiveMessage(fromId: string) {
     this.activeMessage = {
       fromId: '',
@@ -131,5 +151,14 @@ export class PageMessagesComponent implements OnInit {
         }
       }
     }
+  }
+
+  ngAfterViewChecked(): void {
+    this.scrollToBottom();
+  }
+
+  private scrollToBottom(): void {
+    // @ts-ignore
+    this.chatContainer?.nativeElement.scrollTop = this.chatContainer?.nativeElement.scrollHeight;
   }
 }

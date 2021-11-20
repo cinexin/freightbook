@@ -19,6 +19,7 @@
     "nodemon": "^2.0.13",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
-    "time-ago": "^0.2.1"
+    "time-ago": "^0.2.1",
+    "method-override": "*"
   }
 }
