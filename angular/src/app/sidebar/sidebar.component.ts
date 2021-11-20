@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {AuthService} from "../auth.service";
-import {UserDataService} from "../user-data.service";
 import {AutoUnsubscribe} from "../unsubscribe";
+import {EventEmitterService} from "../event-emitter.service";
 
 @Component({
   selector: 'app-sidebar',
@@ -16,11 +16,11 @@ export class SidebarComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private userDataService: UserDataService
+    private eventService: EventEmitterService
   ) { }
 
   ngOnInit(): void {
-    const userDataSubscription = this.userDataService.getUserData.subscribe((user) => {
+    const userDataSubscription = this.eventService.getUserData.subscribe((user) => {
       this.userData = user;
       console.log(user);
     }, (error) => {

@@ -1,7 +1,6 @@
 import {AfterViewChecked, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {Title} from "@angular/platform-browser";
 import {ApiService} from "../api.service";
-import {UserDataService} from "../user-data.service";
 import {AutoUnsubscribe} from "../unsubscribe";
 import {EventEmitterService} from "../event-emitter.service";
 
@@ -29,7 +28,6 @@ export class PageMessagesComponent implements OnInit, AfterViewChecked {
   constructor(
     private title: Title,
     private apiService: ApiService,
-    private centralUserData: UserDataService,
     private eventService: EventEmitterService,
   ) { }
 
@@ -40,7 +38,7 @@ export class PageMessagesComponent implements OnInit, AfterViewChecked {
     if (history.state.data && history.state.data.msgId) {
       this.activeMessage.fromId = history.state.data.msgId;
     }
-    const userDataEvent = this.centralUserData.getUserData.subscribe((user) => {
+    const userDataEvent = this.eventService.getUserData.subscribe((user) => {
       if (!user.messages.length) {return; }
       this.activeMessage.fromId = this.activeMessage.fromId || user.messages[0].from_id;
       this.messages = user.messages.reverse();

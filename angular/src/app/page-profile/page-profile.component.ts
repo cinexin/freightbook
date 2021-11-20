@@ -1,7 +1,6 @@
 import {Component, Inject, OnInit} from '@angular/core';
 import {Title} from "@angular/platform-browser";
 import {DOCUMENT} from "@angular/common";
-import {UserDataService} from "../user-data.service";
 import {ApiService} from "../api.service";
 import {ActivatedRoute} from "@angular/router";
 import {EventEmitterService} from "../event-emitter.service";
@@ -17,7 +16,6 @@ export class PageProfileComponent implements OnInit {
 
   constructor(
     private title: Title,
-    private userDataService: UserDataService,
     private apiService: ApiService,
     private activatedRoute: ActivatedRoute,
     private eventEmitterService: EventEmitterService,
@@ -31,7 +29,7 @@ export class PageProfileComponent implements OnInit {
       sidebar.classList.add('d-none');
     }
 
-     const userDataSubscription = this.userDataService.getUserData.subscribe((user: any) => {
+     const userDataSubscription = this.eventEmitterService.getUserData.subscribe((user: any) => {
        const paramsSubscription = this.activatedRoute.params.subscribe((params) => {
          this.postsToShow = 6;
          if (user._id == params.userId) {

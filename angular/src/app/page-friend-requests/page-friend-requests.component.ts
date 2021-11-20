@@ -1,9 +1,9 @@
 import {Component, Inject, OnInit} from '@angular/core';
-import {UserDataService} from "../user-data.service";
 import {ApiService} from "../api.service";
 import {Title} from "@angular/platform-browser";
 import {DOCUMENT} from "@angular/common";
 import {AutoUnsubscribe} from "../unsubscribe";
+import {EventEmitterService} from "../event-emitter.service";
 
 @Component({
   selector: 'app-page-friend-requests',
@@ -17,7 +17,7 @@ export class PageFriendRequestsComponent implements OnInit {
   private subscriptions: any[] = [];
 
   constructor(
-    private centralUserData: UserDataService,
+    private eventService: EventEmitterService,
     private api: ApiService,
     private title: Title,
     @Inject(DOCUMENT) private document: Document
@@ -29,7 +29,7 @@ export class PageFriendRequestsComponent implements OnInit {
       sidebar.classList.add('d-none');
     }
     this.title.setTitle('Freightbook - Friend Requests');
-    const userDataSubscription = this.centralUserData.getUserData.subscribe((data) => {
+    const userDataSubscription = this.eventService.getUserData.subscribe((data) => {
       this.userData = data;
       const friend_requests = JSON.stringify(this.userData.friend_requests);
       const requestObj = {

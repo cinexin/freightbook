@@ -3,8 +3,8 @@ import {ApiService} from "../api.service";
 import {ActivatedRoute} from "@angular/router";
 import {Title} from "@angular/platform-browser";
 import {DOCUMENT} from "@angular/common";
-import {UserDataService} from "../user-data.service";
 import {AutoUnsubscribe} from "../unsubscribe";
+import {EventEmitterService} from "../event-emitter.service";
 
 @Component({
   selector: 'app-page-searches',
@@ -20,7 +20,7 @@ export class PageSearchesComponent implements OnInit {
     private apiService: ApiService,
     private route: ActivatedRoute,
     private title: Title,
-    private centralUserData: UserDataService,
+    private eventService: EventEmitterService,
     @Inject(DOCUMENT) private document: Document
   ) { }
 
@@ -30,7 +30,7 @@ export class PageSearchesComponent implements OnInit {
       sidebar.classList.add('d-none');
     }
     this.title.setTitle('Search results');
-    const userDataSubscription = this.centralUserData.getUserData.subscribe((data) => {
+    const userDataSubscription = this.eventService.getUserData.subscribe((data) => {
       const paramsSubscription = this.subscription = this.route.params.subscribe(params => {
         this.query = params.query;
         this.user = data;
