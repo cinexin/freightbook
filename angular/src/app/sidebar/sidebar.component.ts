@@ -13,6 +13,8 @@ export class SidebarComponent implements OnInit {
 
   private subscriptions: any[] = [];
   userData: any;
+  public besties: any[] = [];
+  public enemies: any[] = [];
 
   constructor(
     private authService: AuthService,
@@ -22,7 +24,8 @@ export class SidebarComponent implements OnInit {
   ngOnInit(): void {
     const userDataSubscription = this.eventService.getUserData.subscribe((user) => {
       this.userData = user;
-      console.log(user);
+      this.besties = user.besties;
+      this.enemies = user.enemies;
     }, (error) => {
       console.log('Error on user data subscription: ' + error);
     });
