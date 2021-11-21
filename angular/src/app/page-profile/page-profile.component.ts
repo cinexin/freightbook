@@ -30,20 +30,26 @@ export class PageProfileComponent implements OnInit {
     }
 
      const userDataSubscription = this.eventEmitterService.getUserData.subscribe((user: any) => {
+       this.besties = user.besties;
+       this.enemies = user.enemies;
+
        const paramsSubscription = this.activatedRoute.params.subscribe((params) => {
          this.postsToShow = 6;
-         if (user.besties.includes(params.userId)) {
+         if (user.besties.map((b: any) => b._id).includes(params.userId)) {
            this.isBestie = true;
+         } else {
+           this.isBestie = false;
          }
-         if (user.enemies.includes(params.userId)) {
+         if (user.enemies.map((e: any) => e._id).includes(params.userId)) {
            this.isEnemy = true;
+         } else {
+           this.isEnemy = false;
          }
+         this.maxAmountOfBesties = (user.besties.length >= 2);
          if (user._id == params.userId) {
-           console.log('Your profile');
            this.setComponentValues(user);
            this.resetBooleans();
          } else {
-           console.log('Not your profile');
            this.canSendMessage = true;
            const requestObj = {
              location: `users/get-user-data/${params.userId}`,
@@ -81,8 +87,12 @@ export class PageProfileComponent implements OnInit {
   public haveReceivedFriendRequest: boolean = false;
   public postsToShow: number = 6;
 
+  public maxAmountOfBesties: boolean = false;
   public isBestie: boolean = false;
   public isEnemy: boolean = false;
+
+  private besties = [];
+  private enemies = [];
 
   private subscriptions: any[] = [];
 
@@ -138,6 +148,7 @@ export class PageProfileComponent implements OnInit {
     this.haveReceivedFriendRequest = false;
     this.isBestie = false;
     this.isEnemy = false;
+    this.maxAmountOfBesties = false;
   }
 
   updateSendMessageObject(id: string, name: string): void {
@@ -145,6 +156,17 @@ export class PageProfileComponent implements OnInit {
   }
 
   public toggleRequestBestieEnemy(toggle: string): void {
+    const toggleValue = (array: any[]): any[] | undefined => {
+      let index = array.map((item: any) => item._id).indexOf(this.userId);
+      if (index >= 0) {
+        return array.splice(index, 1);
+      } else {
+        array.push({ _id: this.userId});
+        //return array
+        return;
+      }
+    }
+
     const requestObj = {
       location: `users/bestie-enemy-toggle/${this.userId}?toggle=${toggle}`,
       method: 'POST'
@@ -152,8 +174,11 @@ export class PageProfileComponent implements OnInit {
     this.apiService.makeRequest(requestObj).then((val: any) => {
       if (val.statusCode === 201) {
         if (toggle === 'besties') {
+          toggleValue.call(this, this.besties);
+          this.maxAmountOfBesties = this.besties.length >= 2;
           this.isBestie = !this.isBestie;
         } else {
+          toggleValue.call(this, this.enemies);
           this.isEnemy = !this.isEnemy;
         }
       }

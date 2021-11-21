@@ -212,12 +212,26 @@ const getUserData = ({params}, res) => {
         });
       });
     }
+
     user.posts.sort((a, b) => (a.date > b.date) ? -1 : 1);
     enrichPosts(user.posts, user);
     const randomFriends = getRandomFriends(user.friends);
     const commentDetails = enrichComments(user.posts);
     const messageDetails = addMessengerDetails(user.messages);
-    Promise.all([randomFriends, commentDetails, messageDetails]).then((val) => {
+    const besties = new Promise((resolve) => {
+      User.find({_id: {$in: user.besties}}, "name profile_image", (err, users) => {
+        user.besties = users;
+        resolve(user);
+      });
+    });
+    const enemies = new Promise((resolve) => {
+      User.find({_id: {$in: user.enemies}}, "name profile_image", (err, users) => {
+        user.enemies = users;
+        resolve(user);
+      });
+    });
+    let waitFor = [randomFriends, commentDetails, messageDetails, besties, enemies]
+    Promise.all(waitFor).then((val) => {
       user.random_friends = val[0];
       user.comment_details = val[1];
       user.messages = val[2];
@@ -463,10 +477,14 @@ const bestieEnemyToggle = (req, res) => {
     if (!user.friends.includes(targetUserId)) {
       return res.statusJson(422, {message: 'You\'re not friends with this user.'});
     }
+
     const bestiesEnemiesArray = user[toggle];
     if (bestiesEnemiesArray.includes(targetUserId)) {
       bestiesEnemiesArray.splice(bestiesEnemiesArray.indexOf(targetUserId, 1));
     } else {
+      if (toggle === 'besties' && user.besties.length >= 2) {
+        return res.statusJson(422, {message: 'You have reached the max amount of besties.'})
+      }
       bestiesEnemiesArray.push(targetUserId);
     }
     user.save((err) => {
