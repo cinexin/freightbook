@@ -143,4 +143,21 @@ export class PageProfileComponent implements OnInit {
   updateSendMessageObject(id: string, name: string): void {
     this.eventEmitterService.updateSendMessageObjectEvent.emit({ id, name})
   }
+
+  public toggleRequestBestieEnemy(toggle: string): void {
+    const requestObj = {
+      location: `users/bestie-enemy-toggle/${this.userId}?toggle=${toggle}`,
+      method: 'POST'
+    };
+    this.apiService.makeRequest(requestObj).then((val: any) => {
+      if (val.statusCode === 201) {
+        if (toggle === 'besties') {
+          this.isBestie = !this.isBestie;
+        } else {
+          this.isEnemy = !this.isEnemy;
+        }
+      }
+    })
+
+  }
 }

@@ -30,6 +30,9 @@ router.post('/send-message/:to', middleware.authorize, usersCtrl.sendMessage);
 router.post('/reset-message-notifications', middleware.authorize, usersCtrl.resetMessageNotifications);
 router.delete('/messages/:id', middleware.authorize, usersCtrl.deleteMessage);
 
+// Misc Routes
+router.post('/bestie-enemy-toggle/:userId', middleware.authorize, usersCtrl.bestieEnemyToggle);
+
 // Development & testing only!
 router.post('/create-fake-users', fakeUsersCtrl.createFakeUsers);
 

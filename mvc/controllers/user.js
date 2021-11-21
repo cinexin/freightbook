@@ -451,6 +451,31 @@ const deleteMessage = (req, res) => {
   })
 }
 
+const bestieEnemyToggle = (req, res) => {
+  const targetUserId = req.params.userId;
+  const toggle = req.query.toggle;
+  if (toggle !== 'besties' && toggle !== 'enemies') {
+    return res.statusJson(400, {message: 'Incorrect toggle parameter'});
+  }
+  const userId = req.user._id;
+  User.findById(userId, (err, user) => {
+    if (err) { return res.json({err}); }
+    if (!user.friends.includes(targetUserId)) {
+      return res.statusJson(422, {message: 'You\'re not friends with this user.'});
+    }
+    const bestiesEnemiesArray = user[toggle];
+    if (bestiesEnemiesArray.includes(targetUserId)) {
+      bestiesEnemiesArray.splice(bestiesEnemiesArray.indexOf(targetUserId, 1));
+    } else {
+      bestiesEnemiesArray.push(targetUserId);
+    }
+    user.save((err) => {
+      if (err) { return res.json({err}); }
+      return res.statusJson(201, {message: 'Bestie / enemy toggle'});
+    })
+  });
+}
+
 const deleteAllUsers = (req, res) => {
   User.deleteMany({},{}, (err) => {
     if (err) { return res.send({error: err})}
@@ -475,4 +500,5 @@ module.exports = {
   sendMessage,
   resetMessageNotifications,
   deleteMessage,
+  bestieEnemyToggle,
 }
