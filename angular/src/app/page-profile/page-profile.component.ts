@@ -32,6 +32,12 @@ export class PageProfileComponent implements OnInit {
      const userDataSubscription = this.eventEmitterService.getUserData.subscribe((user: any) => {
        const paramsSubscription = this.activatedRoute.params.subscribe((params) => {
          this.postsToShow = 6;
+         if (user.besties.includes(params.userId)) {
+           this.isBestie = true;
+         }
+         if (user.enemies.includes(params.userId)) {
+           this.isEnemy = true;
+         }
          if (user._id == params.userId) {
            console.log('Your profile');
            this.setComponentValues(user);
@@ -74,6 +80,9 @@ export class PageProfileComponent implements OnInit {
   public haveSentFriendRequest: boolean = false;
   public haveReceivedFriendRequest: boolean = false;
   public postsToShow: number = 6;
+
+  public isBestie: boolean = false;
+  public isEnemy: boolean = false;
 
   private subscriptions: any[] = [];
 
@@ -127,6 +136,8 @@ export class PageProfileComponent implements OnInit {
     this.canSendMessage = false;
     this.haveSentFriendRequest = false;
     this.haveReceivedFriendRequest = false;
+    this.isBestie = false;
+    this.isEnemy = false;
   }
 
   updateSendMessageObject(id: string, name: string): void {
