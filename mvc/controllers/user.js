@@ -96,39 +96,48 @@ const loginUser = (req, res) => {
 const generateFeed = (req, res) => {
   const userId = req.user._id;
   let posts = [];
-  const maxAmountOfPosts = 38;
+  const bestiesPosts = [];
+  const maxAmountOfPosts = 48;
 
+  const getPostsFrom = (arrayOfUsers, maxAmountOfPosts, postsArray) => {
+    return new Promise((resolve, reject) => {
+      User.find({_id: {$in: arrayOfUsers}}, 'name posts profile_image', {lean: true}, (err, users) => {
+        if (err) {reject('Error', err); return res.json({err});}
+        users.forEach(user => {
+          enrichPosts(user.posts, user);
+          postsArray.push(...user.posts);
+        });
+        postsArray.sort((a, b) => (a.date > b.date) ? -1 : 1);
+        postsArray = postsArray.splice(maxAmountOfPosts);
+
+        enrichComments(postsArray).then(() => {
+          resolve();
+        })
+      });
+    });
+  }
 
   const myPosts = new Promise((resolve, reject) => {
-    User.findById(userId, 'name posts profile_image friends', {lean: true}, (err, user) => {
+    User.findById(userId, 'name posts profile_image friends besties', {lean: true}, (err, user) => {
       if (err) {return res.json({err})}
       enrichPosts(user.posts, user)
       posts.push(...user.posts);
-      resolve(user.friends);
+      user.friends = user.friends.filter((friendId) => {
+        return !user.besties.includes(friendId);
+      });
+      resolve(user);
     });
   });
 
-  const myFriendsPosts = myPosts.then((friendsArray) => {
-    return new Promise((resolve, reject) => {
-      User.find({'_id': {$in: friendsArray}}, 'name profile_image posts', {lean: true}, (err, users) => {
-        if (err) { return res.json({err}); }
+  const myBestiesPosts = myPosts.then(({besties}) => {
+    return getPostsFrom(besties, 4, bestiesPosts);
+  });
+  const myFriendsPosts = myPosts.then(({friends}) => {
+    return getPostsFrom(friends, maxAmountOfPosts, posts);
+  });
 
-        let user;
-        for (user of users) {
-          enrichPosts(user.posts, user)
-          posts.push(...user.posts);
-        }
-        resolve();
-      });
-    });
-  })
-
-  myFriendsPosts.then(() => {
-    posts.sort((a, b) => (a.date > b.date) ? -1 : 1);
-    posts = posts.slice(0, maxAmountOfPosts);
-    enrichComments(posts).then((posts) => {
-      res.statusJson(200, { posts: posts });
-    });
+  Promise.all([myBestiesPosts, myFriendsPosts]).then(() => {
+    res.statusJson(200, {posts, bestiesPosts});
   });
 }
 

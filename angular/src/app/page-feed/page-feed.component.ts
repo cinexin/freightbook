@@ -26,7 +26,7 @@ export class PageFeedComponent implements OnInit {
     }
     this.apiService.makeRequest(requestObj).then((val: any) => {
       if (val.statusCode == 200) {
-        console.log(val.posts[0]);
+        this.bestiesPosts = val.bestiesPosts;
         let fullCol1 = val.posts.filter((val: any, i: number) => i % 4 === 0);
         let fullCol2 = val.posts.filter((val: any, i: number) => i % 4 === 1);
         let fullCol3 = val.posts.filter((val: any, i: number) => i % 4 === 2);
@@ -47,6 +47,7 @@ export class PageFeedComponent implements OnInit {
     col3: [''],
     col4: ['']
   }
+  bestiesPosts = [];
   newPostContent: String = '';
   newPostTheme: string = this.localStorageService.getPostTheme() || 'primary';
 
