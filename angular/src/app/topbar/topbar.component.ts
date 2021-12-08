@@ -79,7 +79,10 @@ export class TopbarComponent implements OnInit {
     this.subscriptions.push(alertEvent, friendRequestEvent, userDataEvent, updateMessageEvent, resetMessagesEvent)
 
     this.api.makeRequest(requestObj).then((val: any) => {
-      console.log(val);
+      if (val.statusCode !== 200) {
+        return this.authService.logout();
+      }
+
       this.eventEmitterService.getUserData.emit(val.user);
     });
   }

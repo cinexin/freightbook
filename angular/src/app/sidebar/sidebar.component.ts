@@ -12,7 +12,6 @@ import {EventEmitterService} from "../event-emitter.service";
 export class SidebarComponent implements OnInit {
 
   private subscriptions: any[] = [];
-  userData: any;
   public besties: any[] = [];
   public enemies: any[] = [];
 
@@ -23,7 +22,7 @@ export class SidebarComponent implements OnInit {
 
   ngOnInit(): void {
     const userDataSubscription = this.eventService.getUserData.subscribe((user) => {
-      this.userData = user;
+      this.userId = user._id;
       this.besties = user.besties;
       this.enemies = user.enemies;
     }, (error) => {
@@ -32,6 +31,7 @@ export class SidebarComponent implements OnInit {
     this.subscriptions.push(userDataSubscription);
   }
 
+  userId = '';
 
   public logout(): void {
     this.authService.logout();

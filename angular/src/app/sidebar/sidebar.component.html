@@ -14,8 +14,8 @@
   <hr class="sidebar-divider my-0">
 
   <!-- Nav Item - Dashboard -->
-  <li class="nav-item active" *ngIf="userData">
-    <a class="nav-link" href="" routerLink="/profile/{{userData._id}}">
+  <li class="nav-item active" *ngIf="userId">
+    <a class="nav-link" href="" routerLink="/profile/{{userId}}">
       <i class="far fa-address-card"></i>
       <span>Profile</span>
     </a>
@@ -75,9 +75,9 @@
       <span>Quick Actions</span>
     </a>
     <div id="collapsePages" class="quick collapse" data-parent="#accordionSidebar">
-      <div *ngIf="userData" class="bg-white py-2 collapse-inner rounded">
+      <div *ngIf="userId" class="bg-white py-2 collapse-inner rounded">
         <h6 class="collapse-header"></h6>
-        <a class="collapse-item" href="" routerLink="/profile/{{userData._id}}">Profile</a>
+        <a class="collapse-item" href="" routerLink="/profile/{{userId}}">Profile</a>
         <a class="collapse-item" href="" routerLink="/feed">Feed</a>
         <a class="collapse-item" href="" routerLink="/messages">Messages</a>
         <a (click)="logout()" class="collapse-item mt-3" href="" data-toggle="modal" data-target="#logoutModal">Sign Out</a>
