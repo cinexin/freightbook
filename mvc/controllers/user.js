@@ -51,10 +51,23 @@ const alertUser = ({fromUser, toId, type, postContent}, res) => {
       from_name: fromUser.name,
     };
 
+    if (postContent && postContent.length > 28) {
+      postContent = postContent.substring(0, 28) + '...';
+
+    }
+
     switch (type) {
       case 'new_friend':
         alert.alert_text = `${alert.from_name} has accepted your friend request`;
         break;
+      case 'liked_post':
+        alert.alert_text = `${alert.from_name} has liked your post, '${postContent}'`;
+        break;
+      case 'commented_post':
+        alert.alert_text = `${alert.from_name} has commented on your post, '${postContent}'`
+        break;
+      default:
+        return reject('No valid alert type');
     }
 
     User.findById(toId, (err, user) => {
@@ -357,14 +370,33 @@ const likeUnlike = (req, res) => {
   User.findById(postOwnerUserId, (err, user) => {
     if (err) { return res.json({err}) }
     const post = user.posts.id(postIdLiked);
-    if (post.likes.includes(userIdThatDoesTheLike)) {
-      post.likes.splice(post.likes.indexOf(userIdThatDoesTheLike), 1);
-    } else {
-      post.likes.push(userIdThatDoesTheLike);
-    }
-    user.save(() => {
-      if (err) { return res.json({err})}
-      res.statusJson(200, { message: 'Like or unlike a post...' });
+    const promise = new Promise((resolve, reject) => {
+      if (post.likes.includes(userIdThatDoesTheLike)) {
+        post.likes.splice(post.likes.indexOf(userIdThatDoesTheLike), 1);
+        resolve();
+      } else {
+        post.likes.push(userIdThatDoesTheLike);
+        if (postOwnerUserId !== userIdThatDoesTheLike) {
+          User.findById(userIdThatDoesTheLike, (err, user) => {
+            if (err) {
+              reject('Error: ', err);
+              return res.json({err});
+            }
+
+            alertUser({fromUser: user, toId: postOwnerUserId, type: 'liked_post', postContent: post.content}).then(() => {
+              resolve();
+            });
+          });
+        } else {
+          resolve();
+        }
+      }
+    });
+    promise.then(() => {
+      user.save((err) => {
+        if (err) { return res.json({err})}
+        res.statusJson(200, { message: 'Like or unlike a post...' });
+      });
     });
   });
 }
@@ -387,11 +419,23 @@ const commentOnPost = (req, res) => {
       User.findById(commenterUserId, "name profile_image", (err, commenter) => {
         if (err) { return res.json({err})}
 
-        res.statusJson(201, {
-          message: 'Post comment',
-          comment,
-          commenter
+        const promise = new Promise(((resolve, reject) => {
+          if (commenterUserId !== ownerId) {
+            alertUser({fromUser: user, toId: ownerId, type: 'commented_post', postContent: post.content}, res).then(() => {
+              resolve();
+            });
+          } else {
+            resolve();
+          }
+        }));
+        promise.then(() => {
+          res.statusJson(201, {
+            message: 'Post comment',
+            comment,
+            commenter
+          });
         });
+
       })
     });
   });

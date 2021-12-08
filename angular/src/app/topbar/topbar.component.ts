@@ -146,6 +146,16 @@ export class TopbarComponent implements OnInit {
           newAlert.bgColor = 'bg-success';
           newAlert.href = `/profile/${alertObj.from_id}`;
           break;
+        case 'liked_post':
+          newAlert.icon = 'fa-thumbs-up';
+          newAlert.bgColor = 'bg-purple';
+          newAlert.href = `/profile/${this.usersId}`;
+          break;
+        case 'commented_post':
+          newAlert.icon = 'fa-comment';
+          newAlert.bgColor = 'bg-primary';
+          newAlert.href = `/profile/${this.usersId}`;
+          break;
       }
 
       this.alerts.push(newAlert);
