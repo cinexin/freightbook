@@ -47,7 +47,7 @@ const alertUser = ({fromUser, toId, type, postContent}, res) => {
   return new Promise((resolve, reject) => {
     const alert = {
       alert_type: type,
-      from_id: fromUser,
+      from_id: fromUser._id.toString(),
       from_name: fromUser.name,
     };
 

@@ -37,6 +37,7 @@ export class TopbarComponent implements OnInit {
   public usersId = '';
   public profilePicture: string = 'default-avatar';
   public messagePreviews: any[] = [];
+  public alerts: any[] = [];
   public notifications = {
     alerts: 0,
     friendRequests: 0,
@@ -58,8 +59,9 @@ export class TopbarComponent implements OnInit {
     const userDataEvent = this.eventEmitterService.getUserData.subscribe((user) => {
       this.notifications.friendRequests = user.friend_requests.length;
       this.notifications.messages = user.new_message_notifications.length;
-       this.notifications.alerts = user.new_notifications;
+      this.notifications.alerts = user.new_notifications;
       this.profilePicture = user.profile_image;
+      this.setAlerts(user.notifications);
       this.setMessagePreviews(user.messages, user.new_message_notifications);
       console.log(this.messagePreviews);
     });
@@ -126,6 +128,28 @@ export class TopbarComponent implements OnInit {
 
   messageLink(messageId: any) {
     this.router.navigate(['/messages'], {state: {data: {msgId: messageId}}});
+  }
+
+  private setAlerts(notificationData: any) {
+    notificationData.forEach((alert: string) => {
+      const alertObj = JSON.parse(alert);
+      const newAlert = {
+        text: alertObj.alert_text,
+        icon: '',
+        bgColor: '',
+        href: ''
+      };
+
+      switch (alertObj.alert_type) {
+        case 'new_friend':
+          newAlert.icon = 'fa-user-check';
+          newAlert.bgColor = 'bg-success';
+          newAlert.href = `/profile/${alertObj.from_id}`;
+          break;
+      }
+
+      this.alerts.push(newAlert);
+    });
   }
 
   public logout(): void {
