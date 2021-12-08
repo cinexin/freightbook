@@ -43,6 +43,33 @@ const enrichPosts = (posts, user) => {
   }
 }
 
+const alertUser = ({fromUser, toId, type, postContent}, res) => {
+  return new Promise((resolve, reject) => {
+    const alert = {
+      alert_type: type,
+      from_id: fromUser,
+      from_name: fromUser.name,
+    };
+
+    switch (type) {
+      case 'new_friend':
+        alert.alert_text = `${alert.from_name} has accepted your friend request`;
+        break;
+    }
+
+    User.findById(toId, (err, user) => {
+      if (err) {reject('Error', err); return res.json({err});}
+
+      user.new_notifications++;
+      user.notifications.push(JSON.stringify(alert));
+      user.save((err) => {
+        if (err) {reject('Error', err); return res.json({err});}
+        resolve();
+      });
+    })
+  });
+}
+
 const registerUser = ({ body }, res) => {
   if (Object.keys(body).length === 0 || !Object.values(body).every((val) => val)) {
     return res.send({ message: 'All Fields are required' });
@@ -279,7 +306,7 @@ const resolveFriendRequest = ({query, params}, res) => {
           }
 
           user.friends.push(to);
-          user.save((err, user) => {
+          user.save((err) => {
             if (err) { return res.json({err}) }
             resolve();
           });
@@ -289,9 +316,11 @@ const resolveFriendRequest = ({query, params}, res) => {
       }
     });
     promise.then(() => {
-      user.save((err, user) => {
+      user.save((err) => {
         if (err) { return res.json({err}) }
-        res.statusJson(200, { message: 'Friend request resolved', ...query, ...params });
+        alertUser({fromUser: user, toId: from, type: 'new_friend', postContent: null}, res).then(() => {
+          res.statusJson(200, { message: 'Friend request resolved', ...query, ...params });
+        });
       })
     });
   });

@@ -58,6 +58,7 @@ export class TopbarComponent implements OnInit {
     const userDataEvent = this.eventEmitterService.getUserData.subscribe((user) => {
       this.notifications.friendRequests = user.friend_requests.length;
       this.notifications.messages = user.new_message_notifications.length;
+       this.notifications.alerts = user.new_notifications;
       this.profilePicture = user.profile_image;
       this.setMessagePreviews(user.messages, user.new_message_notifications);
       console.log(this.messagePreviews);
