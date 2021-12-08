@@ -160,7 +160,8 @@ const generateFeed = (req, res) => {
 
   const myPosts = new Promise((resolve, reject) => {
     User.findById(userId, 'name posts profile_image friends besties', {lean: true}, (err, user) => {
-      if (err) {return res.json({err})}
+      if (err) {return res.statusJson(500, {err})}
+      if (!user) {return res.statusJson(422, {message: 'User does not exist'})}
       enrichPosts(user.posts, user)
       posts.push(...user.posts);
       user.friends = user.friends.filter((friendId) => {
@@ -219,7 +220,9 @@ const makeFriendRequest = ({params}, res) => {
 const getUserData = ({params}, res) => {
   const userId = params.userid;
   User.findById(userId, '-salt -password', {lean: true}, (err, user) => {
-    if (err) { return res.json({err: err}); }
+    if (err) {return res.statusJson(500, {err})}
+    if (!user) {return res.statusJson(422, {message: 'User does not exist'})}
+
     const getRandomFriends = (friendsList) => {
       let copyOfFriendsList = Array.from(friendsList);
       let randomIds = [];
