@@ -108,6 +108,9 @@ export class PageMessagesComponent implements OnInit, AfterViewChecked {
     this.apiService.makeRequest(requestObj).then(() => {
       const removeIdx = this.messages.findIndex((message) => message._id === msgId);
       this.messages.splice(removeIdx, 1);
+      if (!this.messages.length) {
+        return;
+      }
       this.setActiveMessage(this.messages[0].from_id);
     }).catch((error: string) => {
       this.eventService.onAlertEvent.emit('Error deleting chat');
