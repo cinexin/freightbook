@@ -32,6 +32,7 @@ router.delete('/messages/:id', middleware.authorize, usersCtrl.deleteMessage);
 
 // Misc Routes
 router.post('/bestie-enemy-toggle/:userId', middleware.authorize, usersCtrl.bestieEnemyToggle);
+router.post('/reset-alert-notifications', middleware.authorize, usersCtrl.resetAlertNotifications);
 
 // Development & testing only!
 router.post('/create-fake-users', fakeUsersCtrl.createFakeUsers);

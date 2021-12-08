@@ -74,7 +74,8 @@ const alertUser = ({fromUser, toId, type, postContent}, res) => {
       if (err) {reject('Error', err); return res.json({err});}
 
       user.new_notifications++;
-      user.notifications.push(JSON.stringify(alert));
+      user.notifications.splice(18);
+      user.notifications.unshift(JSON.stringify(alert));
       user.save((err) => {
         if (err) {reject('Error', err); return res.json({err});}
         resolve();
@@ -576,6 +577,18 @@ const bestieEnemyToggle = (req, res) => {
   });
 }
 
+const resetAlertNotifications = (req, res) => {
+  const userId = req.user._id;
+  User.findById(userId, (err, user) => {
+    if (err) { return res.json({err}); }
+    user.new_notifications = 0;
+    user.save((err) => {
+      if (err) { return res.json({err}); }
+      return res.statusJson(200, {message: 'Reset Alert Notifications.'})
+    });
+  });
+}
+
 const deleteAllUsers = (req, res) => {
   User.deleteMany({},{}, (err) => {
     if (err) { return res.send({error: err})}
@@ -600,5 +613,6 @@ module.exports = {
   sendMessage,
   resetMessageNotifications,
   deleteMessage,
+  resetAlertNotifications,
   bestieEnemyToggle,
 }

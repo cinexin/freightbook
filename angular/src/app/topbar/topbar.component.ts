@@ -95,7 +95,27 @@ export class TopbarComponent implements OnInit {
   }
 
   resetMessageNotifications() {
+    if (this.notifications.messages === 0) {
+      return;
+    }
+
     this.api.resetMessageNotifications();
+  }
+
+  resetAlertNotifications() {
+    if (this.notifications.alerts === 0) {
+      return;
+    }
+
+    const requestObj = {
+      location: 'users/reset-alert-notifications',
+      method: 'POST',
+    }
+    this.api.makeRequest(requestObj).then((val: any) => {
+      if (val.statusCode === 200) {
+        this.notifications.alerts = 0;
+      }
+    });
   }
 
   private setMessagePreviews(messages: any[], messageNotifications: any[]): void {
